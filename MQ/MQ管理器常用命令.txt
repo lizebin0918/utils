@@ -1,0 +1,85 @@
+WebSphere, 命令WebSphere, 命令
+
+1. 创建/删除队列管理器
+   crtmqm -q QMA
+   （-q表示QMA为默认队列管理器）
+   dltmqm
+
+2. 启动队列管理器
+   strmqm QMA
+   （对于默认队列管理器，则为strmqm ）
+
+3. 启动管理器平台
+   runmqsc QMA
+   a. dis qmgr //查看MQ的相关信息，例如CCSID
+   b. dis ql(*) //查看所有对列
+   c. dis ql(*) curdepth //查看所有对列的深度
+   d. dis ql(LQ.MSG.EMO.888888888) MSGDLVSQ //查看队列的消息传递顺序
+
+4. 定义本地队列
+   define qlocal(queueA)
+   若用于队列管理器之间进行通信，这应为 define qlocal(queue1) usage(xmitq)
+
+5. 定义远程队列
+   define qremote(queue.remote) rname(apple.queue) rqmname('queueB') xmitq(queue1)
+   （apple.queue为远程队列管理器queueB中的本地队列）
+
+6. 定义发送端通道
+   define channel(queueA.queueB) chltype(sdr) conname('192.168.1.90(1414)') xmitq(queueA) trptype(tcp)
+
+7. 定义接受方通道
+   define channel(queueA.queueB) chltype(rcvr) trptype(tcp)
+
+8. 更改侦听端端口号
+   alter listener(system.default.listener.tcp) trptype(tcp) port(1415)
+
+9. 启动侦听
+   start listener(system.default.listener.tcp)
+   在命令行 c:\runmqlsr
+
+10. 列出侦听状态
+   display lsstatus(*)
+
+11. 测试， 向队列中放入消息
+   amqsput queue_name queue_manager_name
+    从队列中取出消息
+   amqsget queue_name queue_manager_name
+
+12. 在服务器方建立用于客户方链接的通道
+   define channel(channel2) chltype(svrconn) trptype(tcp) mcauser(' ')
+
+13. 在客户机方，使用MQSERVER定义客户机链接通道（如使用了Active Directory 服务支持，则可略过本步骤）
+    SET MQSERVER=CHANNEL1/TCP/192.168.1.90(1414)   //Windows
+    export MQSERVER=’CHANNEL1/TCP/server-hostname(port)’  //linux
+
+15.  测试， 向队列中放入消息 
+   amqsputc queue_name queue_manager_name
+    从队列中取出消息
+   amqsgetc queue_name queue_manager_name
+
+16. 关闭队列管理器
+   endmqm mqm_name
+   endmqm -i mqm_name
+
+17. 结束所有侦听进程
+   endmqlsr  -m mqm_name
+
+18. 查看WebSphere MQ版本号
+   dspmqver
+
+19. 查看已有的MQ管理器
+   dspmq
+
+20. 启动WebSphere MQ Explorer
+   strmqcfg
+
+21. "dspmqfls" command to convert between real and transformed object names. 
+
+22. 修改队列属性
+	alter ql(LQ.MSG.EMO.888888888) MSGDLVSQ(PRIORITY) //修改消息传递顺序为优先级；PRIORITY:优先级，FIFO:先进先出
+
+MQ资源管理器连接远程MQ：
+1、MQ管理器需要已启动
+2、MQ管理器需要启动侦听（默认是1414）
+3、6.0版本默认使用“SYSTEM.ADMIN.SVRCONN”作为服务器连接通道，需检查MQ管理器是否已创建该通道
+   DEFINE CHANNEL(SYSTEM.ADMIN.SVRCONN) CHLTYPE(SVRCONN) TRPTYPE(TCP) MCAUSER('mqm')

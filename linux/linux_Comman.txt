@@ -1,0 +1,6 @@
+1.清空文档 :1,$d
+2.查看tomcat进程 ps -ef|grep tomcat
+3.查看文件 view 文件名
+快捷键 Ctrl+F(下一页) Ctrl+B(下一页) g+g(返回顶部)
+4.文件跟踪 tail -f 文件名
+5.显示文件列表并倒序显示 ls -lrt

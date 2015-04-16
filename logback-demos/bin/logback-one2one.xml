@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true" scanPeriod="15 seconds">
+		<!-- 定义常量 ，下面可以引用  -->
+		<property name="LOG_HOME" value="LOG" /><!-- log目录 -->
+		<property name="BACKUP_HOME" value="${LOG_HOME}/backup" /><!-- 日志备份目录 -->
+	<appender name="ONE2ONE" class="ch.qos.logback.classic.sift.SiftingAppender">
+		<discriminator>
+			<Key>userid</Key>
+			<DefaultValue>@UserDefault</DefaultValue>
+		</discriminator>
+		<sift>
+			<appender name="${userid}"
+				class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<File>LOG/users/${userid}.log</File>
+				<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+					<FileNamePattern>
+						LOG/backup/users/%d{yyyy-MM-dd-HH-mm}/${userid}.%d{yyyyMMdd_HHmm}.log.zip
+					</FileNamePattern>
+					<MaxHistory>4</MaxHistory>
+				</rollingPolicy>
+				<layout class="ch.qos.logback.classic.PatternLayout">
+					<pattern>
+						%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n   
+            		</pattern>
+				</layout>
+			</appender>
+		</sift>
+	</appender>
+	<!-- 设置根 的日志级别 -->
+	<root level="debug">
+		<!-- 不要忘记了对于appender的 引用 根元素是配置文件的入口 -->
+		<appender-ref ref="ONE2ONE" />
+	</root>
+
+</configuration>

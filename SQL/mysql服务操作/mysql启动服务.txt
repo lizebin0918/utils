@@ -1,0 +1,12 @@
+一、mysql
+安装mysql服务
+	mysqld --install house_mysql --defaults-file=D:\house\mysql\my.ini
+	
+启动mysql数据库
+	net start house_mysql
+
+停止服务
+	net stop house_mysql
+
+删除服务
+	mysqld --remove house_mysql

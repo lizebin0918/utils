@@ -1,0 +1,65 @@
+通过银结通的dao封装：
+<sql-query name="updateUiFileLogByResponse">
+		<![CDATA[
+			update `UI_FILE_LOG` as uiFileLog
+			SET uiFileLog.FAIL_AMT = (select IFNULL(SUM(YKJE),0) from UI_PLDS where FILE_ID = :fileId and `STATUS` = 'F'),
+			uiFileLog.SUC_AMT = (select IFNULL(SUM(YKJE),0) from UI_PLDS where  FILE_ID = :fileId and `STATUS` = 'S'),
+			uiFileLog.HOLD_AMT = (select IFNULL(SUM(YKJE),0) from UI_PLDS where FILE_ID = :fileId and `STATUS` = 'E'),
+			uiFileLog.FAIL_CNT = (select count(*) from UI_PLDS WHERE FILE_ID = :fileId and `STATUS` = 'F'),
+			uiFileLog.SUC_CNT = (select count(*) from UI_PLDS WHERE FILE_ID = :fileId and `STATUS` ='S'),
+			uiFileLog.HOLD_CNT = (select count(*) from UI_PLDS WHERE FILE_ID = :fileId and `STATUS` = 'E')
+			where uiFileLog.FILE_ID = :fileId
+		]]>
+	</sql-query>
+	<sql-query name="getUiFileLogBeforeHours">
+		<return alias="uiFileLog" class="com.yjt.gcss.gddw.common.bean.domain.UiFileLog"/>
+		select 
+		FILE_ID as {uiFileLog.fileId},
+		REQ_HEAD_JYBSH as {uiFileLog.reqHeadJybsh},
+		REQ_HEAD_YWBSH as {uiFileLog.reqHeadYwbsh},
+		REQ_JYLSH as {uiFileLog.reqJylsh},
+		REQ_JYRQ as {uiFileLog.reqJyrq},
+		REQ_JYSJ as {uiFileLog.reqJysj},
+		REQ_DWBM as {uiFileLog.reqDwbm},
+		REQ_SFFS as {uiFileLog.reqSffs},
+		REQ_FYLX as {uiFileLog.reqFylx},
+		REQ_KHBZ as {uiFileLog.reqKhbz},
+		REQ_WJMC as {uiFileLog.reqWjmc},
+		REQ_WJLX as {uiFileLog.reqWjlx},
+		REQ_WJMD5 as {uiFileLog.reqWjmd5},
+		REQ_ZBS as {uiFileLog.reqZbs},
+		REQ_ZJE as {uiFileLog.reqZje},
+		FILE_HEAD_PLDSXXBS as {uiFileLog.fileHeadPldsxxbs},
+		FILE_HEAD_YHDM as {uiFileLog.fileHeadYhdm},
+		FILE_HEAD_DWBM as {uiFileLog.fileHeadDwbm},
+		FILE_HEAD_SYHRQ as {uiFileLog.fileHeadSyhrq},
+		FILE_HEAD_HBFH as {uiFileLog.fileHeadHbfh},
+		FILE_HEAD_SFFS as {uiFileLog.fileHeadSffs},
+		FILE_HEAD_FYLX as {uiFileLog.fileHeadFylx},
+		FILE_HEAD_ZBS as {uiFileLog.fileHeadZbs},
+		FILE_HEAD_ZJE as {uiFileLog.fileHeadZje},
+		FILE_HEAD_SM as {uiFileLog.fileHeadSm},
+		RSP_JYLSH as {uiFileLog.rspJylsh},
+		RSP_JYRQ as {uiFileLog.rspJyrq},
+		RSP_JYSJ as {uiFileLog.rspJysj},
+		RSP_WJLX as {uiFileLog.rspWjlx},
+		RSP_WJMD5 as {uiFileLog.rspWjmd5},
+		SUC_CNT as {uiFileLog.sucCnt},
+		SUC_AMT as {uiFileLog.sucAmt},
+		HOLD_CNT as {uiFileLog.holdCnt},
+		HOLD_AMT as {uiFileLog.holdAmt},
+		FAIL_CNT as {uiFileLog.failCnt},
+		FAIL_AMT as {uiFileLog.failAmt},
+		FILE_STATUS as {uiFileLog.fileStatus},
+		FILE_STATUS_REMARK as {uiFileLog.fileStatusRemark},
+		STATUS as {uiFileLog.status},
+		CREATE_DATE as {uiFileLog.createDate},
+		CREATE_TIME as {uiFileLog.createTime},
+		REMARK as {uiFileLog.remark},
+		REPLY_FILE_NAME as {uiFileLog.replyFileName},
+		RET_CD as {uiFileLog.retCd},
+		RET_CD_REMARK as {uiFileLog.retCdRemark}
+		from UI_FILE_LOG as t
+		where t.FILE_STATUS='E' AND str_to_date(CONCAT(CREATE_DATE, CREATE_TIME),'%Y%m%d%H%i%s')
+		BETWEEN DATE_SUB(sysdate(),INTERVAL ? HOUR) AND sysdate()
+	</sql-query>

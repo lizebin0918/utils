@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%-5p] [%d{yy-MM-dd HH:mm:ss}] [%-40t] %c.%M() %x - (%m)%n"/>
+		</layout>
+	</appender>
+
+	<appender name="TEXTFILE" class="com.common.log.DailyMaxRollingFileAppender">
+		<param name="File" value="../logs/ump.log"/>
+		<param name="DatePattern" value="'.'yyyyMMdd"/>
+		<param name="MaxBackupIndex" value="365"/>
+		<param name="Encoding" value="UTF-8" />
+		<!-- 提高IO性能 -->		
+		<param name="BufferedIO" value="false"/>
+		<param name="BufferSize" value="8192"/>
+
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%-5p] [%d{yy-MM-dd HH:mm:ss}] [%-40t] %c.%M() %x - (%m)%n"/>
+		</layout>
+	</appender>
+
+	<appender name="ERRORFILE" class="com.common.log.DailyMaxRollingFileAppender">
+		<param name="Threshold" value="ERROR"/>
+		<param name="Encoding" value="UTF-8" />
+		<param name="File" value="../logs/ump_error.log"/>
+		<param name="DatePattern" value="'.'yyyyMMdd"/>
+		<param name="MaxBackupIndex" value="365"/>
+		
+		<!-- 提高IO性能 -->		
+		<param name="BufferedIO" value="false"/>
+		<param name="BufferSize" value="8192"/>
+
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%-5p] [%d{yy-MM-dd HH:mm:ss}] [%-40t] %c.%M() %x - (%m)%n"/>
+		</layout>
+	</appender>
+
+	<logger name="org.hibernate.type">
+		<level value="INFO"/>
+	</logger>
+	<!--
+	<logger name="net.sf.jasperreports">
+		<level value="DEBUG"/>
+	</logger>
+	-->
+	<logger name="org.springframework">
+		<level value="INFO"/>
+	</logger>
+
+	<!-- 
+	<logger name="org.springframework.integration">
+		<level value="INFO"/>
+	</logger>
+	 -->
+	<root>
+		<priority value="INFO"/>
+		
+<!-- 		提高性能 ，生产中不打开CONSOLE。避免catalina.out太大 -->
+		<appender-ref ref="CONSOLE"/>
+		 
+		<appender-ref ref="TEXTFILE"/>
+		<appender-ref ref="ERRORFILE"/>
+	</root>
+	
+</log4j:configuration>

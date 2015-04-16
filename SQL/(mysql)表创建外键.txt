@@ -1,0 +1,3 @@
+ALTER TABLE cems_mapping_booking_customer ADD CONSTRAINT fk_cpu_model 
+FOREIGN KEY (booking_id) 
+REFERENCES cems_booking(id);

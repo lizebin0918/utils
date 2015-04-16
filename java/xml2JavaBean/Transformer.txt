@@ -1,0 +1,26 @@
+public static String DOMDocumentToString(Document doc) throws TransformerException
+{
+    DOMSource domSource = new DOMSource(doc);
+    StringWriter writer = new StringWriter();
+    StreamResult result = new StreamResult(writer);
+    TransformerFactory tf = TransformerFactory.newInstance();
+    Transformer transformer = tf.newTransformer();
+    transformer.transform(domSource, result);
+    writer.flush();
+    return writer.toString();
+}
+
+public static <T> Document objectToDOMDocument (T object) throws ParserConfigurationException, IOException, SAXException
+{
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder builder = factory.newDocumentBuilder();
+    doc = builder.newDocument();
+    ByteArrayOutputStream st = new ByteArrayOutputStream();
+
+    XMLEncoder encoder = new XMLEncoder(st);
+    encoder.writeObject(object);
+    encoder.close();
+    String tmp =  st.toString();
+    Document doc = builder.parse(new InputSource(new StringReader(tmp)));
+    return doc;
+}
