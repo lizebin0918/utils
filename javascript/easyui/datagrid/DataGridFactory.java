@@ -4,18 +4,20 @@ import javax.servlet.ServletRequest;
 
 public class DataGridFactory {
 
-	private static DataGridFactory instance = new DataGridFactory();
+	private static volatile DataGridFactory instance = null;
 
 	private DataGridFactory() {
 	}
 
 	public static DataGridFactory getInstance() {
 		if (instance == null) {
-			instance = new DataGridFactory();
-			return instance;
+    	    synchronized(DataGridFactory.class){
+		        if(null == instance){
+		            instance = new DataGridFactory();
+		        }
+		    }
 		}
-		else
-			return instance;
+		return instance;
 	}
 	
 	public DataGridModel getDataGridModel(ServletRequest request) {
