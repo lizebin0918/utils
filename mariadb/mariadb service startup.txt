@@ -1,0 +1,14 @@
+windows7:
+1.running windows terminal
+2.input:sc create "maria100" binpath= "\"D:/Program Files (x86)/MariaDB 10.0/bin/mysqld\" \"--defaults-file=D:/Program Files (x86)/MariaDB 10.0/data/my.ini\" maria100" DisplayName= "Maria100" start= "auto"
+output:[SC] CreateService 成功
+3.input:net start maria100
+output:
+maria100 服务正在启动 .
+maria100 服务已经启动成功。
+
+linux:
+1. 在mariadb的根目录下， 新建一个quick_start.sh脚本，添加并保存内容如下:
+cd '.' ; ./bin/mysqld_safe --datadir='./data' &
+2. 运行qucik_start.sh
+
