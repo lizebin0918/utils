@@ -12,3 +12,5 @@ linux:
 cd '.' ; ./bin/mysqld_safe --datadir='./data' &
 2. 运行qucik_start.sh
 
+mac:
+安装mariadb：https://mariadb.com/blog/installing-mariadb-10010-mac-os-x-homebrew
