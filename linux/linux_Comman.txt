@@ -4,3 +4,31 @@
 快捷键 Ctrl+F(下一页) Ctrl+B(下一页) g+g(返回顶部)
 4.文件跟踪 tail -f 文件名
 5.显示文件列表并倒序显示 ls -lrt
+6.查看端口占用情况:netstat –apn | grep 端口号
+7.压缩文件:tar  -zcvf   压缩文件名.tar.gz   被压缩文件名
+-c  建立新的归档文件
+-r  向归档文件末尾追加文件
+-x  从归档文件中解出文件
+-O  将文件解开到标准输出
+-v  处理过程中输出相关信息
+-f  对普通文件操作
+-z  调用gzip来压缩归档文件，与-x联用时调用gzip完成解压缩
+8.解压缩文件:tar  -zxvf   压缩文件名.tar.gz
+9.kill进程:$ kill -s 9 PID
+10.sftp -oPort=22 username@172.21.255.132
+11.查看磁盘空间:df -h
+12.linux设置环境变量:SCRIPT_DIR=$HOME/script/pgs/backup     ;       export SCRIPT_DIR
+(比如我们要用一个命令，但这个命令的执行文件不在当前目录，这样我们每次用的时候必须指定执行文件的目录，麻烦，
+在代码中先执行export，这个相当于告诉程序，执行某某东西时，需要的文件或什么东东在这些目录里)
+13.输出当前日期:echo `date '+%Y%m%d%H%M%S'`
+14.删除文件file中出现的"Snail"字符:cat file | tr -d "Snail" > new_file
+15. > : 表示以流的形式输出(替换或者删除);  >> : 表示添加到文件末尾
+16. 查找tomcat/apache-tomcat-7.0.37/目录下的所有文件，路径含有yjtorgfep的元素: 
+	find tomcat/apache-tomcat-7.0.37/ -print | grep 'yjtorgfep'
+   ~ 路径以".log"的元素(find的name选项不支持正则表达式): 
+	find tomcat/apache-tomcat-7.0.37/ -print | grep '.log$'
+	find tomcat/apache-tomcat-7.0.37/ -name '*.log' -print	  
+17.nohup 是表示让进城在后台运行
+18.递归文件夹权限:chmod -R a+rwx pgs
+19.压缩当前的文件夹 zip -r ./a.zip ./*
+20.root用户修改系统时间:date -s "2015-05-31 09:03:00"
