@@ -1,28 +1,11 @@
-package com.talent.common.util;
+﻿package com.base.framework.common.tools;
 
-
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2005
- * </p>
- * <p>
- * Company: talent
- * </p>
- * 
- * @author lsj
- * @version 1.0
- */
 
 public class TimeUtil {
 	public TimeUtil() {
@@ -200,7 +183,7 @@ public class TimeUtil {
 	 * @param date
 	 * @param oldFormat
 	 * @param newFormat
-	 * @return
+	 * @return String
 	 */
 	public static String changeStrTimeFormat(String date, String oldFormat,
 			String newFormat) {
@@ -304,13 +287,145 @@ public class TimeUtil {
 			return false;
 		}
 		
-		SimpleDateFormat df = new SimpleDateFormat(format);
+		DateFormat dateFormat = new SimpleDateFormat(format);
 		try {
-			df.parse(date);
-			return true;
+			Date formatDate = dateFormat.parse(date);
+			return date.equals(dateFormat.format(formatDate));
 		} catch (ParseException e) {
 			return false;
 		}
 	}
+	
+	/**
+     * 获取时间date1与date2相差的秒数
+     * 
+     * @param date1
+     *            起始时间
+     * @param date2
+     *            结束时间
+     * @return 返回相差的秒数
+     */
+    public static long getOffsetSeconds(Date date1, Date date2) {
+        long seconds = (long) ((date2.getTime() - date1.getTime()) / 1000);
+        return seconds;
+    }
+    
+    /**
+     * 获取时间date1与date2相差的分钟数
+     * 
+     * @param date1
+     *            起始时间
+     * @param date2
+     *            结束时间
+     * @return 返回相差的分钟数
+     */
+    public static long getOffsetMinutes(Date date1, Date date2) {
+        return getOffsetSeconds(date1, date2) / 60;
+    }
+    
+    /**
+     * 获取时间date1与date2相差的小时数
+     * 
+     * @param date1
+     *            起始时间
+     * @param date2
+     *            结束时间
+     * @return 返回相差的小时数
+     */
+    public static long getOffsetHours(Date date1, Date date2) {
+        return getOffsetMinutes(date1, date2) / 60;
+    }
+ 
+    /**
+     * 获取时间date1与date2相差的天数数
+     * 
+     * @param date1
+     *            起始时间
+     * @param date2
+     *            结束时间
+     * @return 返回相差的天数
+     */
+    public static long getOffsetDays(Date date1, Date date2) {
+        return getOffsetHours(date1, date2) / 24;
+    }
+    
+    /**
+     * 获取时间date1与date2相差的周数
+     * 
+     * @param date1
+     *            起始时间
+     * @param date2
+     *            结束时间
+     * @return 返回相差的周数
+     */
+    public static long getOffsetWeeks(Date date1, Date date2) {
+        return getOffsetDays(date1, date2) / 7;
+    }
+    
+    /**
+     * 获取指定日期累加年月日后的时间
+     * 
+     * @param date
+     *            指定日期
+     * @param year
+     *            指定年数
+     * @param month
+     *            指定月数
+     * @param day
+     *            指定天数
+     * @return 返回累加年月日后的时间
+     */
+    public static Date rollDate(Date date, int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        if (date != null) {
+            cal.setTime(date);
+        }
+        cal.add(Calendar.YEAR, year);
+        cal.add(Calendar.MONTH, month);
+        cal.add(Calendar.DAY_OF_MONTH, day);
+        return cal.getTime();
+    }
+    
+    /**
+     * 获取指定日期累加指定月数后的时间
+     * 
+     * @param date
+     *            指定日期
+     * @param month
+     *            指定月数
+     * @return 返回累加月数后的时间
+     */
+    public static Date rollMonth(Date date, int month) {
+        return rollDate(date, 0, month, 0);
+    }
+ 
+    /**
+     * 获取指定日期累加指定天数后的时间
+     * 
+     * @param date
+     *            指定日期
+     * @param day
+     *            指定天数
+     * @return 返回累加天数后的时间
+     */
+    public static Date rollDay(Date date, int day) {
+        return rollDate(date, 0, 0, day);
+    }
+ 
+    /**
+     * 计算指定日期所在月份的天数
+     * 
+     * @param date
+     *            指定日期
+     * @return 返回所在月份的天数
+     */
+    public static int getDayOfMonth(Date date) {
+        Calendar cal = Calendar.getInstance();
+        if (date != null) {
+            cal.setTime(date);
+        }
+        int dayOfMonth = cal.getActualMaximum(Calendar.DATE);
+        return dayOfMonth;
+    }
 
 }
