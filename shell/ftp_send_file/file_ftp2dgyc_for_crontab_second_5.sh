@@ -24,9 +24,9 @@
 #
 #	ftp constant variable
 #
-FTP_ADDR="56.16.32.132"
-FTP_USER=gddw
-FTP_PWD=gddw
+FTP_ADDR="31.1.4.16"
+FTP_USER=dgyc
+FTP_PWD=dgyc1113
 #FTP_ADDR="56.16.32.193"
 #FTP_USER=administrator
 #FTP_PWD=1

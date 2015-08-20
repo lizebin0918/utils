@@ -24,13 +24,13 @@
 #
 #	file directory
 #
-SCRIPT_DIR=/root/lizebin/test/script
+SCRIPT_DIR=/tools
 
 #update1
-LOC_SND_DIR=/root/lizebin/dgyc/fsend
-LOC_TMP_DIR=/root/lizebin/dgyc/tmp
-RMT_SND_DIR=/home/gddw/test/send
-RMT_TMP_DIR=/home/gddw/test/tmp
+LOC_SND_DIR=/si/usr/dgyc/fsend
+LOC_TMP_DIR=/si/usr/dgyc/tmp
+RMT_SND_DIR=/
+RMT_TMP_DIR=/
 CURRENT_DATE_TIME=$(date "+%Y%m%d%H%M%S")
 PID_NUMBER=$$$CURRENT_DATE_TIME
 TMP_FILE_SUFFIX=".tmp"
@@ -50,7 +50,7 @@ rm -f $LOC_TMP_DIR/file.lst.$PID_NUMBER > /dev/null 2>&1
 
 ls -1 -F QRYTYP* | grep -v [/$] | grep -v ["$TMP_FILE_SUFFIX"$] | while read LINE
 	do
-		lsof |grep $LINE |grep -v lsof|grep -v grep > /dev/null 2>&1
+		/usr/sbin/lsof |grep $LINE |grep -v lsof|grep -v grep > /dev/null 2>&1
 		if [ "$?" = "1" ]
 		then
 			mv $LINE $LINE$TMP_FILE_SUFFIX
@@ -78,10 +78,10 @@ then
 	cat $LOC_TMP_DIR/file.lst.$PID_NUMBER | while read LINE
 	do
 		#update3
-		lsof |grep $LINE$TMP_FILE_SUFFIX |grep -v lsof|grep -v grep > /dev/null 2>&1
+		/usr/sbin/lsof |grep $LINE$TMP_FILE_SUFFIX |grep -v lsof|grep -v grep > /dev/null 2>&1
 		if [ "$?" = "1" ]
 		then
-			$SCRIPT_DIR/file_ftp2dgyc.sh $LOC_SND_DIR $LOC_TMP_DIR $LINE $RMT_SND_DIR $RMT_TMP_DIR $PID_NUMBER $TMP_FILE_SUFFIX
+			$SCRIPT_DIR/file_ftp2dgyc_for_crontab_second_5.sh $LOC_SND_DIR $LOC_TMP_DIR $LINE $RMT_SND_DIR $RMT_TMP_DIR $PID_NUMBER $TMP_FILE_SUFFIX
 		fi
 	done
 fi
