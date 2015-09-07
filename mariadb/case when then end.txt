@@ -1,0 +1,20 @@
+select name,  
+ case   
+        when birthday<'1981' then 'old'  
+        when birthday>'1988' then 'yong'  
+        else 'ok' END YORN  
+from lee; 
+
+select NAME,  
+ case name  
+     when 'sam' then 'yong'  
+        when 'lee' then 'handsome'  
+        else 'good' end  
+from lee;
+
+select name,birthday,  
+ case   
+     when birthday>'1983' then 'yong'  
+        when name='lee' then 'handsome'  
+        else 'just so so ' end  
+from lee;  

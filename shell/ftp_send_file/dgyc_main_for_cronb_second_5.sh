@@ -34,6 +34,7 @@ RMT_TMP_DIR=/
 CURRENT_DATE_TIME=$(date "+%Y%m%d%H%M%S")
 PID_NUMBER=$$$CURRENT_DATE_TIME
 TMP_FILE_SUFFIX=".tmp"
+FILE_NAME_FILTER_REGULATION="QRYTYP*"
 
 #----------------------------------------------------------------
 #
@@ -48,7 +49,7 @@ cd $LOC_SND_DIR
 
 rm -f $LOC_TMP_DIR/file.lst.$PID_NUMBER > /dev/null 2>&1
 
-ls -1 -F QRYTYP* | grep -v [/$] | grep -v ["$TMP_FILE_SUFFIX"$] | while read LINE
+ls -1 -F ${FILE_NAME_FILTER_REGULATION} | grep -v [/$] | grep -v ["$TMP_FILE_SUFFIX"$] | while read LINE
 	do
 		/usr/sbin/lsof |grep $LINE |grep -v lsof|grep -v grep > /dev/null 2>&1
 		if [ "$?" = "1" ]
