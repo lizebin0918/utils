@@ -1,3 +1,4 @@
+############### case when then else end ####################
 select name,  
  case   
         when birthday<'1981' then 'old'  
@@ -17,4 +18,10 @@ select name,birthday,
      when birthday>'1983' then 'yong'  
         when name='lee' then 'handsome'  
         else 'just so so ' end  
-from lee;  
+from lee;
+
+############# if function ######################################
+SELECT FILE_ID,IF(FILE_ID = '9f8381a64d5018ac014d5045224d0000',1,0) FROM UI_FILE_LOG;
+SELECT 
+    id,IF(type = 'P', IFNULL(amount,0), IFNULL(amount,0) * -1) as amount
+FROM    report

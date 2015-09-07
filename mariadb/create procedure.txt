@@ -1,0 +1,12 @@
+DROP PROCEDURE IF EXISTS LIZEBIN_TEST;
+CREATE PROCEDURE LIZEBIN_TEST(IN INPUT_PARAM varchar(255), OUT OUT_PARAM varchar(255))
+BEGIN
+	SELECT @count:=count(*) FROM ui_file_log;
+	IF(@count > 0) THEN
+		SELECT 1;
+	ELSE		
+		SELECT 2;
+	END IF;
+	SELECT @OUT_PARAM := count(*) - 1 FROM ui_file_log;
+	SELECT COUNT(*) INTO OUT_PARAM FROM ui_file_log;
+END;
