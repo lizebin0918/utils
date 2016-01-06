@@ -1,0 +1,4 @@
+#ignore directory
+ignore/
+#ignore file '.gitignore'
+.gitignore
