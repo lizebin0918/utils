@@ -1,27 +1,31 @@
-package com.talent.common.easyui.datagrid;
+package com.lzb.common.easyui.datagrid;
+
+import java.util.LinkedHashMap;
 
 import javax.servlet.ServletRequest;
 
 public class DataGridFactory {
 
-	private static volatile DataGridFactory instance = null;
-
-	private DataGridFactory() {
-	}
+	private DataGridFactory() {}
 
 	public static DataGridFactory getInstance() {
-		if (instance == null) {
-    	    synchronized(DataGridFactory.class){
-		        if(null == instance){
-		            instance = new DataGridFactory();
-		        }
-		    }
-		}
-		return instance;
+		return InnerSingletonClass.instance;
 	}
 	
-	public DataGridModel getDataGridModel(ServletRequest request) {
-		return new DataGridModel(request);
+	private static class InnerSingletonClass {
+		private static DataGridFactory instance = new DataGridFactory();
+	}
+	
+	public DataGridDTO getDataGridDTO(ServletRequest request) {
+		return new DataGridDTO(request);
+	}
+	
+	public DataGridDTO getDataGridDTO(int page, int rows, LinkedHashMap<String, String> orders) {
+		return new DataGridDTO(page, rows, orders);
+	}
+	
+	public DataGridDTO getDataGridDTO() {
+		return new DataGridDTO(null);
 	}
 
 }
