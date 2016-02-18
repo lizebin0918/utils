@@ -1,14 +1,45 @@
-﻿package com.base.framework.common.tools;
-
-import java.text.DateFormat;
+﻿import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * <p>
+ * Title:
+ * </p>
+ * <p>
+ * Description:
+ * </p>
+ * <p>
+ * Copyright: Copyright (c) 2005
+ * </p>
+ * <p>
+ * Company: talent
+ * </p>
+ * 
+ * @author lsj
+ * 	updated by lizebin on 2016-02-18
+ * @version 1.0
+ */
 
 public class TimeUtil {
-	public TimeUtil() {
+	private TimeUtil() {
+	}
+	
+	private static final ThreadLocal<SimpleDateFormat> innerVariables = new ThreadLocal<SimpleDateFormat>();
+	
+	private static SimpleDateFormat getSimpleDateFormatInstance(String pattern) {
+		SimpleDateFormat sdf = innerVariables.get();
+		if(sdf == null) {
+			sdf = new SimpleDateFormat(pattern);
+			innerVariables.set(sdf);
+			return sdf;
+		}
+		if(!pattern.equals(sdf.toPattern())) {
+			sdf.applyPattern(pattern);
+		}
+		return sdf;
 	}
 
 	/**
@@ -21,7 +52,7 @@ public class TimeUtil {
 	public static String getPreMonth(String today, String format, int n) {
 		String result = null;
 		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+			SimpleDateFormat sdf = getSimpleDateFormatInstance("yyyyMM");
 			String tmp = changeStrTimeFormat(today, format, "yyyyMMdd");
 			int year = Integer.parseInt(tmp.substring(0, 4));
 			int month = Integer.parseInt(tmp.substring(4, 6));
@@ -48,7 +79,7 @@ public class TimeUtil {
 	public static String getMonthLastDate(String today, String format) {
 		String result = null;
 		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			SimpleDateFormat sdf = getSimpleDateFormatInstance("yyyyMMdd");
 			String tmp = changeStrTimeFormat(today, format, "yyyyMMdd");
 			int year = Integer.parseInt(tmp.substring(0, 4));
 			int month = Integer.parseInt(tmp.substring(4, 6));
@@ -75,7 +106,7 @@ public class TimeUtil {
 	public static String getPreMonthLastDate(String today, String format) {
 		String result = null;
 		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			SimpleDateFormat sdf = getSimpleDateFormatInstance("yyyyMMdd");
 			String tmp = changeStrTimeFormat(today, format, "yyyyMMdd");
 			int year = Integer.parseInt(tmp.substring(0, 4));
 			int month = Integer.parseInt(tmp.substring(4, 6));
@@ -98,7 +129,7 @@ public class TimeUtil {
 	public static String getNextMonthFirstDate(String today, String format) {
 		String result = null;
 		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			SimpleDateFormat sdf = getSimpleDateFormatInstance("yyyyMMdd");
 			String tmp = changeStrTimeFormat(today, format, "yyyyMMdd");
 			int year = Integer.parseInt(tmp.substring(0, 4));
 			int month = Integer.parseInt(tmp.substring(4, 6));
@@ -124,7 +155,7 @@ public class TimeUtil {
 	public static String getFirstDateOfTheMonth(String today, String format) {
 		String result = null;
 		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			SimpleDateFormat sdf = getSimpleDateFormatInstance("yyyyMMdd");
 			String tmp = changeStrTimeFormat(today, format, "yyyyMMdd");
 			int year = Integer.parseInt(tmp.substring(0, 4));
 			int month = Integer.parseInt(tmp.substring(4, 6));
@@ -150,8 +181,8 @@ public class TimeUtil {
 			if(date == null)
 				result = "";
 			else{
-				SimpleDateFormat sdf = new SimpleDateFormat(format);
-				result = sdf.format(date).toString();
+				SimpleDateFormat sdf = getSimpleDateFormatInstance(format);
+				result = sdf.format(date);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -169,7 +200,7 @@ public class TimeUtil {
 	public static Date strTimeToDate(String date, String format) {
 		Date result = null;
 		try {
-			SimpleDateFormat sdf = new SimpleDateFormat(format);
+			SimpleDateFormat sdf = getSimpleDateFormatInstance(format);
 			result = sdf.parse(date);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -183,7 +214,7 @@ public class TimeUtil {
 	 * @param date
 	 * @param oldFormat
 	 * @param newFormat
-	 * @return String
+	 * @return
 	 */
 	public static String changeStrTimeFormat(String date, String oldFormat,
 			String newFormat) {
@@ -192,7 +223,7 @@ public class TimeUtil {
 			if (date == null || date.equals(""))
 				return "";
 			else {
-				SimpleDateFormat sdf = new SimpleDateFormat(oldFormat);
+				SimpleDateFormat sdf = getSimpleDateFormatInstance(oldFormat);
 				Date tmp = sdf.parse(date);
 				sdf.applyPattern(newFormat);
 				result = sdf.format(tmp);
@@ -210,8 +241,7 @@ public class TimeUtil {
 	**/
 	public static String getCurDate( String dateFormat ) 
 	{
-		java.text.SimpleDateFormat sdf = 
-			new java.text.SimpleDateFormat(dateFormat);
+		SimpleDateFormat sdf = getSimpleDateFormatInstance(dateFormat);
 		Calendar c1 = Calendar.getInstance(); // today
 		return sdf.format(c1.getTime());
 	}
@@ -230,26 +260,13 @@ public class TimeUtil {
 	}
 	
 	/**
-	 * 计算从date开始n月以前（以后）的日期
-	 * @param date
-	 * @param monthCnt
-	 * @return
-	 */
-	public static Date getDateRelateToMonth(Date date, int monthCnt){
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(date);
-		calendar.add(Calendar.MONTH, monthCnt);
-		return calendar.getTime();
-	}
-	
-	/**
 	 * 将字符串转换为日期类型
 	 * @param date
 	 * @param format
 	 * @return
 	 */
 	public static Date changeStrToDate(String date, String format){
-		SimpleDateFormat sf = new SimpleDateFormat(format);
+		SimpleDateFormat sf = getSimpleDateFormatInstance(format);
 		Date dt = null;
 		try {
 			dt = sf.parse(date);
@@ -257,23 +274,6 @@ public class TimeUtil {
 			e.printStackTrace();
 		}
 		return dt;
-	}
-	
-	/**
-	 * 取得上一个工作日
-	 * @param date
-	 * @return
-	 */
-	public static Date getLastWorkday(Date date){
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(date);
-		  int today = calendar.getTime().getDay();
-		  if(today == calendar.getFirstDayOfWeek()){
-			  calendar.roll(Calendar.DAY_OF_YEAR, -3);
-		  }else{
-			  calendar.roll(Calendar.DAY_OF_YEAR, -1);
-		  }
-		  return calendar.getTime();
 	}
 	
 	/**
@@ -287,7 +287,7 @@ public class TimeUtil {
 			return false;
 		}
 		
-		DateFormat dateFormat = new SimpleDateFormat(format);
+		DateFormat dateFormat = getSimpleDateFormatInstance(format);
 		try {
 			Date formatDate = dateFormat.parse(date);
 			return date.equals(dateFormat.format(formatDate));
@@ -427,5 +427,4 @@ public class TimeUtil {
         int dayOfMonth = cal.getActualMaximum(Calendar.DATE);
         return dayOfMonth;
     }
-
 }
