@@ -23,7 +23,7 @@ import java.util.Date;
  * @version 1.0
  */
 
-public final class TimeUtil {
+ppublic final class TimeUtil {
 
 	private TimeUtil() {
 		throw new Error("Don't instance" + TimeUtil.class.getName());
@@ -58,10 +58,8 @@ public final class TimeUtil {
 	 */
 	public static final String DATE_FORMAT_yyyy_MM_dd_HH_mm = "yyyy-MM-dd HH:mm";
 
-
 	private static final ThreadLocal<Map<String, InnerSimpleDateFormat>> innerVariables = new ThreadLocal<Map<String, InnerSimpleDateFormat>>();
 	
-	//fixed a bug
 	private static InnerSimpleDateFormat getSimpleDateFormatInstance(final String pattern) {
 		Map<String, InnerSimpleDateFormat> sdfMap = innerVariables.get();
 		if(sdfMap == null) {
@@ -89,21 +87,6 @@ public final class TimeUtil {
 			throw new RuntimeException("date format don't chanage");
 		}
 	}
-	
-	/*!!!!!!!!!!!!!!!!!!!!!!!it will have a bug
-	private static final ThreadLocal<SimpleDateFormat> innerVariables = new ThreadLocal<SimpleDateFormat>();
-	private static SimpleDateFormat getSimpleDateFormatInstance(String pattern) {
-		SimpleDateFormat sdf = innerVariables.get();
-		if (sdf == null) {
-			sdf = new SimpleDateFormat(pattern);
-			innerVariables.set(sdf);
-			return sdf;
-		}
-		if (!pattern.equals(sdf.toPattern())) {
-			sdf.applyPattern(pattern);
-		}
-		return sdf;
-	}*/
 
 	/**
 	 * 返回当月月份前n个月份的年月
@@ -116,8 +99,6 @@ public final class TimeUtil {
 			String format, int n) {
 		String result = null;
 		try {
-			// !!!!!!!!!!!!!!!!!!!!!!!it is bug use code on 65
-			// SimpleDateFormat sdf = getSimpleDateFormatInstance("yyyyMM");
 			String tmp = changeStrTimeFormat(today, format,
 					DATE_FORMAT_yyyyMMdd);
 			int year = Integer.parseInt(tmp.substring(0, 4));
@@ -333,11 +314,11 @@ public final class TimeUtil {
 			else {
 				InnerSimpleDateFormat sdf = getSimpleDateFormatInstance(oldFormat);
 				Date tmp = sdf.parse(date);
-				sdf.applyPattern(newFormat);
+				sdf = getSimpleDateFormatInstance(newFormat);
 				result = sdf.format(tmp);
 			}
 		} catch (Exception e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 		}
 		if (result == null) {
 			return "";
@@ -397,11 +378,10 @@ public final class TimeUtil {
 		if (null == date || "".equals(date.trim())) {
 			return false;
 		}
-
 		try {
 			InnerSimpleDateFormat dateFormat = getSimpleDateFormatInstance(format);
 			Date formatDate = dateFormat.parse(date);
-			return date.equals(dateFormat.format(formatDate));
+			return changeStrTimeFormat(date, format, format).equals(dateFormat.format(formatDate));
 		} catch (ParseException e) {
 			return false;
 		}
