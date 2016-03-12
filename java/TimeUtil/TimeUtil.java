@@ -58,8 +58,10 @@ ppublic final class TimeUtil {
 	 */
 	public static final String DATE_FORMAT_yyyy_MM_dd_HH_mm = "yyyy-MM-dd HH:mm";
 
+
 	private static final ThreadLocal<Map<String, InnerSimpleDateFormat>> innerVariables = new ThreadLocal<Map<String, InnerSimpleDateFormat>>();
 	
+	//fixed a bug
 	private static InnerSimpleDateFormat getSimpleDateFormatInstance(final String pattern) {
 		Map<String, InnerSimpleDateFormat> sdfMap = innerVariables.get();
 		if(sdfMap == null) {
@@ -83,11 +85,9 @@ ppublic final class TimeUtil {
 		}
 		
 		@Deprecated
-		public void applyPattern(String pattern) {
-			throw new RuntimeException("date format don't chanage");
-		}
+		public void applyPattern(String pattern) {}
 	}
-
+	
 	/**
 	 * 返回当月月份前n个月份的年月
 	 * 
@@ -99,6 +99,8 @@ ppublic final class TimeUtil {
 			String format, int n) {
 		String result = null;
 		try {
+			// !!!!!!!!!!!!!!!!!!!!!!!it is bug use code on 65
+			// SimpleDateFormat sdf = getSimpleDateFormatInstance("yyyyMM");
 			String tmp = changeStrTimeFormat(today, format,
 					DATE_FORMAT_yyyyMMdd);
 			int year = Integer.parseInt(tmp.substring(0, 4));
@@ -164,7 +166,7 @@ ppublic final class TimeUtil {
 			calendar.set(year, month - 1, 1, 0, 0, 0);
 			InnerSimpleDateFormat sdf = getSimpleDateFormatInstance(outputFormat);
 			result = sdf.format(new Date(
-					calendar.getTime().getTime() - 1000 * 60 * 60));
+					calendar.getTime().getTime() - 1000));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -209,8 +211,7 @@ ppublic final class TimeUtil {
 			String inputFormat, String outputFormat) {
 		String result = null;
 		try {
-			String tmp = changeStrTimeFormat(today, inputFormat,
-					DATE_FORMAT_yyyyMMdd);
+			String tmp = DATE_FORMAT_yyyyMMdd.equals(inputFormat) ? today : changeStrTimeFormat(today, inputFormat, DATE_FORMAT_yyyyMMdd);
 			int year = Integer.parseInt(tmp.substring(0, 4));
 			int month = Integer.parseInt(tmp.substring(4, 6));
 			Calendar calendar = Calendar.getInstance();
@@ -243,40 +244,6 @@ ppublic final class TimeUtil {
 			e.printStackTrace();
 		}
 		return result;
-	}
-
-	/**
-	 * 获取当周第一天，周一作为一个星期的第一天
-	 * @param today
-	 * @param inputDateFormat
-	 * @param outputDateFormat
-	 * @return
-	 */
-	public static String getFirstDayOfWeek(String today, String inputDateFormat, String outputDateFormat) {
-		Date sourceDate = changeStrToDate(today, inputDateFormat);
-		Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        calendar.setTime(sourceDate);
-        calendar.set(Calendar.DAY_OF_WEEK,
-                      calendar.getFirstDayOfWeek());
-        return dateFormat(calendar.getTime(), outputDateFormat);
-	}
-	
-	/**
-	 * 获取当周最后一天，周日为一个星期的最后一天
-	 * @param today
-	 * @param inputDateFormat
-	 * @param outputDateFormat
-	 * @return
-	 */
-	public static String getLastDayOfWeek(String today, String inputDateFormat, String outputDateFormat) {
-		Date sourceDate = changeStrToDate(today, inputDateFormat);
-		Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        calendar.setTime(sourceDate);
-        calendar.set(Calendar.DAY_OF_WEEK,
-                      calendar.getFirstDayOfWeek() + 6);
-        return dateFormat(calendar.getTime(), outputDateFormat);
 	}
 
 	/**
@@ -318,7 +285,7 @@ ppublic final class TimeUtil {
 				result = sdf.format(tmp);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 		if (result == null) {
 			return "";
@@ -348,7 +315,37 @@ ppublic final class TimeUtil {
 		calendar.add(Calendar.DATE, dateCnt);
 		return calendar.getTime();
 	}
-
+	
+	/**
+	 * 获取当周第一天，周一作为一个星期的第一天
+	 * @param date
+	 * @return
+	 */
+	public static String getFirstDayOfWeek(String today, String inputDateFormat, String outputDateFormat) {
+		Date sourceDate = changeStrToDate(today, inputDateFormat);
+		Calendar calendar = Calendar.getInstance();
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setTime(sourceDate);
+        calendar.set(Calendar.DAY_OF_WEEK,
+                      calendar.getFirstDayOfWeek());
+        return dateFormat(calendar.getTime(), outputDateFormat);
+	}
+	
+	/**
+	 * 获取当周最后一天，周日为一个星期的最后一天
+	 * @param date
+	 * @return
+	 */
+	public static String getLastDayOfWeek(String today, String inputDateFormat, String outputDateFormat) {
+		Date sourceDate = changeStrToDate(today, inputDateFormat);
+		Calendar calendar = Calendar.getInstance();
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setTime(sourceDate);
+        calendar.set(Calendar.DAY_OF_WEEK,
+                      calendar.getFirstDayOfWeek() + 6);
+        return dateFormat(calendar.getTime(), outputDateFormat);
+	}
+	
 	/**
 	 * 将字符串转换为日期类型
 	 * 
@@ -378,6 +375,7 @@ ppublic final class TimeUtil {
 		if (null == date || "".equals(date.trim())) {
 			return false;
 		}
+
 		try {
 			InnerSimpleDateFormat dateFormat = getSimpleDateFormatInstance(format);
 			Date formatDate = dateFormat.parse(date);
@@ -454,6 +452,34 @@ ppublic final class TimeUtil {
 	}
 
 	/**
+	 * 时间计算 +(-)N分钟
+	 * @param date
+	 * @param minute
+	 * @return
+	 */
+	public static Date rollMinute(Date date, int minute){
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.MINUTE, minute);
+		Date date1 = new Date(calendar.getTimeInMillis());
+		return date1;
+	}
+	
+	/**
+	 * 时间计算 +(-)N小时
+	 * @param date
+	 * @param minute
+	 * @return
+	 */
+	public static Date rollHour(Date date, int hour){
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.HOUR_OF_DAY, hour);
+		Date date1 = new Date(calendar.getTimeInMillis());
+		return date1;
+	}
+	
+	/**
 	 * 获取指定日期累加年月日后的时间
 	 * 
 	 * @param date
@@ -517,5 +543,35 @@ ppublic final class TimeUtil {
 		}
 		int dayOfMonth = cal.getActualMaximum(Calendar.DATE);
 		return dayOfMonth;
+	}
+	
+	/**
+	 * 将时间置为一天中最早的时刻
+	 * @param now
+	 * @return
+	 */
+	public static Date lower(Date now){
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTime(now);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return calendar.getTime();
+	}
+	
+	/**
+	 * 将时间置为一天最晚的时刻
+	 * @param now
+	 * @return
+	 */
+	public static Date upper(Date now){
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTime(now);
+		calendar.set(Calendar.HOUR_OF_DAY, 23);
+		calendar.set(Calendar.MINUTE, 59);
+		calendar.set(Calendar.SECOND, 59);
+		calendar.set(Calendar.MILLISECOND, 999);
+		return calendar.getTime();
 	}
 }
