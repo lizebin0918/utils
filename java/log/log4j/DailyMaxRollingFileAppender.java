@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 1999-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,124 +14,124 @@
  * limitations under the License.
  */
 
-package com.mall.log;
+package com.base.framework.common.log;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.TimeZone;
+import java.util.Locale;
 
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Layout;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
+
+import org.apache.log4j.*;
 
 /**
  * DailyMaxRollingFileAppender extends {@link FileAppender} so that the
  * underlying file is rolled over at a user chosen frequency.
- * 
+ *
  * <p>
  * The rolling schedule is specified by the <b>DatePattern</b>. This pattern
  * should follow the {@link SimpleDateFormat} conventions. In particular, you
  * <em>must</em> escape literal text within a pair of single quotes. A formatted
  * version of the date pattern is used as the suffix for the rolled file name.
- * 
+ *
  * <p>
  * For example, if the <b>File</b> option is set to <code>/foo/bar.log</code>
  * and the <b>DatePattern</b> set to <code>'.'yyyy-MM-dd</code>, on 2001-02-16
  * at midnight, the logging file <code>/foo/bar.log</code> will be copied to
  * <code>/foo/bar.log.2001-02-16</code> and logging for 2001-02-17 will continue
  * in <code>/foo/bar.log</code> until it rolls over the next day.
- * 
+ *
  * <p>
  * Is is possible to specify monthly, weekly, half-daily, daily, hourly, or
  * minutely rollover schedules.
- * 
+ *
  * <p>
  * <table border="1" cellpadding="2">
  * <tr>
  * <th>DatePattern</th>
  * <th>Rollover schedule</th>
  * <th>Example</th>
- * 
+ *
  * <tr>
  * <td><code>'.'yyyy-MM</code>
  * <td>Rollover at the beginning of each month</td>
- * 
+ *
  * <td>At midnight of May 31st, 2002 <code>/foo/bar.log</code> will be copied to
  * <code>/foo/bar.log.2002-05</code>. Logging for the month of June will be
  * output to <code>/foo/bar.log</code> until it is also rolled over the next
  * month.
- * 
+ *
  * <tr>
  * <td><code>'.'yyyy-ww</code>
- * 
+ *
  * <td>Rollover at the first day of each week. The first day of the week depends
  * on the locale.</td>
- * 
+ *
  * <td>Assuming the first day of the week is Sunday, on Saturday midnight, June
  * 9th 2002, the file <i>/foo/bar.log</i> will be copied to
  * <i>/foo/bar.log.2002-23</i>. Logging for the 24th week of 2002 will be output
  * to <code>/foo/bar.log</code> until it is rolled over the next week.
- * 
+ *
  * <tr>
  * <td><code>'.'yyyy-MM-dd</code>
- * 
+ *
  * <td>Rollover at midnight each day.</td>
- * 
+ *
  * <td>At midnight, on March 8th, 2002, <code>/foo/bar.log</code> will be copied
  * to <code>/foo/bar.log.2002-03-08</code>. Logging for the 9th day of March
  * will be output to <code>/foo/bar.log</code> until it is rolled over the next
  * day.
- * 
+ *
  * <tr>
  * <td><code>'.'yyyy-MM-dd-a</code>
- * 
+ *
  * <td>Rollover at midnight and midday of each day.</td>
- * 
+ *
  * <td>At noon, on March 9th, 2002, <code>/foo/bar.log</code> will be copied to
  * <code>/foo/bar.log.2002-03-09-AM</code>. Logging for the afternoon of the 9th
  * will be output to <code>/foo/bar.log</code> until it is rolled over at
  * midnight.
- * 
+ *
  * <tr>
  * <td><code>'.'yyyy-MM-dd-HH</code>
- * 
+ *
  * <td>Rollover at the top of every hour.</td>
- * 
+ *
  * <td>At approximately 11:00.000 o'clock on March 9th, 2002,
  * <code>/foo/bar.log</code> will be copied to
  * <code>/foo/bar.log.2002-03-09-10</code>. Logging for the 11th hour of the 9th
  * of March will be output to <code>/foo/bar.log</code> until it is rolled over
  * at the beginning of the next hour.
- * 
- * 
+ *
+ *
  * <tr>
  * <td><code>'.'yyyy-MM-dd-HH-mm</code>
- * 
+ *
  * <td>Rollover at the beginning of every minute.</td>
- * 
+ *
  * <td>At approximately 11:23,000, on March 9th, 2001, <code>/foo/bar.log</code>
  * will be copied to <code>/foo/bar.log.2001-03-09-10-22</code>. Logging for the
  * minute of 11:23 (9th of March) will be output to <code>/foo/bar.log</code>
  * until it is rolled over the next minute.
- * 
+ *
  * </table>
- * 
+ *
  * <p>
  * Do not use the colon ":" character in anywhere in the <b>DatePattern</b>
  * option. The text before the colon is interpeted as the protocol specificaion
  * of a URL which is probably not what you want.
- * 
+ *
  * <p>
  * You have also to define the maximum number of file are kept before the oldest
  * is erased.
  * </p>
- * 
+ *
  * @author Eirik Lygre
  * @author Ceki G&uuml;lc&uuml;
  * @author Riccardo Nicosia;
@@ -167,17 +167,15 @@ public class DailyMaxRollingFileAppender extends FileAppender {
 	 * variable when the next interval is entered. For example, if the rollover
 	 * period is one hour, the log file will be renamed to the value of
 	 * "scheduledFilename" at the beginning of the next hour.
-	 * 
+	 *
 	 * The precise time when a rollover occurs depends on logging activity.
 	 */
-	private String scheduledFilename;
+	private volatile String scheduledFilename;
 
 	/**
 	 * The next time we estimate a rollover should occur.
 	 */
-	private long nextCheck = System.currentTimeMillis() - 1;
-
-	private Date now = new Date();
+	private volatile long nextCheck = System.currentTimeMillis() - 1;
 
 	RollingPastCalendar rpc = new RollingPastCalendar();
 
@@ -196,7 +194,7 @@ public class DailyMaxRollingFileAppender extends FileAppender {
 	 * Instantiate a <code>DailyRollingFileAppender</code> and open the file
 	 * designated by <code>filename</code>. The opened filename will become the
 	 * ouput destination for this appender.
-	 * 
+	 *
 	 */
 	public DailyMaxRollingFileAppender(Layout layout, String filename, String datePattern) throws IOException {
 		super(layout, filename, true);
@@ -219,7 +217,7 @@ public class DailyMaxRollingFileAppender extends FileAppender {
 
 	/**
 	 * Set the maximum number of backup files to keep around.
-	 * 
+	 *
 	 * <p>
 	 * The <b>MaxBackupIndex</b> option determines how many backup files are
 	 * kept before the oldest is erased. This option takes a positive integer
@@ -246,7 +244,6 @@ public class DailyMaxRollingFileAppender extends FileAppender {
 		LogLog.debug("Max backup file size kept: " + MaxFileSize + ".");
 
 		if (datePattern != null && fileName != null) {
-			now.setTime(System.currentTimeMillis());
 			SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
 			int type = computeCheckPeriod();
 			printPeriodicity(type);
@@ -328,7 +325,7 @@ public class DailyMaxRollingFileAppender extends FileAppender {
 		}
 
 		SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
-		
+
 		String datedFilename = fileName + sdf.format(_now);
 		// It is too early to roll over because we are still within the
 		// bounds of the current interval. Rollover will occur once the
@@ -337,13 +334,13 @@ public class DailyMaxRollingFileAppender extends FileAppender {
 			return;
 		}
 
-		SimpleDateFormat sdf2 = new SimpleDateFormat("HHmmss");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("HH-mm-ss");
 
 		String time = sdf2.format(_now);
 		// close current file, and rename it to datedFilename
 		this.closeFile();
 
-		File target = new File(scheduledFilename + time);
+		File target = new File(scheduledFilename + "-" + time);
 		if (target.exists()) {
 			target.delete();
 		}
@@ -400,8 +397,7 @@ public class DailyMaxRollingFileAppender extends FileAppender {
 		long n = System.currentTimeMillis();
 		File file = new File(fileName);
 		if (n >= nextCheck) {
-			now.setTime(n);
-			nextCheck = rpc.getNextCheckMillis(now);
+			nextCheck = rpc.getNextCheckMillis(new Date());
 
 			try {
 				rollOver();
