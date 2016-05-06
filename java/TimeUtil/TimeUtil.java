@@ -3,6 +3,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.WeakHashMap;
 
 /**
  * <p>
@@ -59,13 +60,14 @@ ppublic final class TimeUtil {
 	public static final String DATE_FORMAT_yyyy_MM_dd_HH_mm = "yyyy-MM-dd HH:mm";
 
 
-	private static final ThreadLocal<Map<String, InnerSimpleDateFormat>> innerVariables = new ThreadLocal<Map<String, InnerSimpleDateFormat>>();
+	private static final ThreadLocal<WeakHashMap<String, InnerSimpleDateFormat>> innerVariables = new ThreadLocal<WeakHashMap<String, InnerSimpleDateFormat>>();
 	
 	//fixed a bug
 	private static InnerSimpleDateFormat getSimpleDateFormatInstance(final String pattern) {
 		Map<String, InnerSimpleDateFormat> sdfMap = innerVariables.get();
 		if(sdfMap == null) {
-			sdfMap = new HashMap<String, InnerSimpleDateFormat>(2);
+			//采用 HashMap 会导致内存溢出
+			sdfMap = new WeakHashMap<String, InnerSimpleDateFormat>(2);
 			innerVariables.set(sdfMap);
 		}
 		InnerSimpleDateFormat sdf = sdfMap.get(pattern);
