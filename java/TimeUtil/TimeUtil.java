@@ -101,8 +101,6 @@ ppublic final class TimeUtil {
 			String format, int n) {
 		String result = null;
 		try {
-			// !!!!!!!!!!!!!!!!!!!!!!!it is bug use code on 65
-			// SimpleDateFormat sdf = getSimpleDateFormatInstance("yyyyMM");
 			String tmp = changeStrTimeFormat(today, format,
 					DATE_FORMAT_yyyyMMdd);
 			int year = Integer.parseInt(tmp.substring(0, 4));
@@ -343,9 +341,9 @@ ppublic final class TimeUtil {
 		Calendar calendar = Calendar.getInstance();
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
         calendar.setTime(sourceDate);
-        calendar.set(Calendar.DAY_OF_WEEK,
-                      calendar.getFirstDayOfWeek() + 6);
-        return dateFormat(calendar.getTime(), outputDateFormat);
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek() + 6);
+        calendar.add(Calendar.DATE, 1);
+        return dateFormat(new Date(calendar.getTime().getTime() - 1000), outputDateFormat);
 	}
 	
 	/**
@@ -436,8 +434,8 @@ ppublic final class TimeUtil {
 	 *            结束时间
 	 * @return 返回相差的天数
 	 */
-	public static long getOffsetDays(Date date1, Date date2) {
-		return getOffsetHours(date1, date2) / 24;
+	public static long getOffsetDays(Date startDate, Date endDate) {
+		return getOffsetHours(startDate, endDate) / 24;
 	}
 
 	/**
@@ -452,7 +450,30 @@ ppublic final class TimeUtil {
 	public static long getOffsetWeeks(Date date1, Date date2) {
 		return getOffsetDays(date1, date2) / 7;
 	}
-
+	
+	/**
+	 * 获取时间startDate与endDate相差的月数
+	 * 
+	 * @param startDate
+	 *            起始时间
+	 * @param endDate
+	 *            结束时间
+	 * @return 返回相差的天数
+	 */
+	public static int getOffsetMonths(Date startDate, Date endDate) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(startDate);
+		int curYear = calendar.get(Calendar.YEAR);
+		int curMonths =  calendar.get(Calendar.MONTH) + 1;
+		int curDays = calendar.get(Calendar.DAY_OF_MONTH);
+		calendar.setTime(endDate);
+		int endYear = calendar.get(Calendar.YEAR);
+		int endMonths =  calendar.get(Calendar.MONTH) + 1;
+		int endDays = calendar.get(Calendar.DAY_OF_MONTH);
+		int uy = (endYear - curYear) * 12 + (endMonths - curMonths) + (endDays < curDays ? -1 : 0); 
+		return uy;
+	}
+	
 	/**
 	 * 时间计算 +(-)N分钟
 	 * @param date
@@ -548,32 +569,54 @@ ppublic final class TimeUtil {
 	}
 	
 	/**
-	 * 将时间置为一天中最早的时刻
-	 * @param now
+	 * 将时间置为一天中最早的一秒
+	 * @param today
+	 * @param inputDateFormat
+	 * @param outputDateFormat
 	 * @return
 	 */
-	public static Date lower(Date now){
+	public static String getFirstSecondOfDay(String today, String inputDateFormat, String outputDateFormat){
+		Date now = strTimeToDate(today, inputDateFormat);
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.setTime(now);
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
-		return calendar.getTime();
+		return dateFormat(calendar.getTime(), outputDateFormat);
 	}
 	
 	/**
-	 * 将时间置为一天最晚的时刻
-	 * @param now
+	 * 将时间置为一天最晚的一秒
+	 * @param today
+	 * @param inputDateFormat
+	 * @param outputDateFormat
 	 * @return
 	 */
-	public static Date upper(Date now){
+	public static String getLastSecondOfDay(String today, String inputDateFormat, String outputDateFormat){
+		Date now = strTimeToDate(today, inputDateFormat);
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.setTime(now);
 		calendar.set(Calendar.HOUR_OF_DAY, 23);
 		calendar.set(Calendar.MINUTE, 59);
 		calendar.set(Calendar.SECOND, 59);
 		calendar.set(Calendar.MILLISECOND, 999);
-		return calendar.getTime();
+		return dateFormat(calendar.getTime(), outputDateFormat);
+	}
+	
+	/**
+	 * 根据日期返回周几，周日为7
+	 * @param date
+	 * @param inputDateFormat
+	 * @return
+	 */
+	public static int getWeekday(String date, String inputDateFormat) {
+		Calendar c = Calendar.getInstance();
+		c.setTime((strTimeToDate(date, inputDateFormat)));
+		int weekday = c.get(Calendar.DAY_OF_WEEK) - 1;
+		if(weekday <= 0) {
+			return 7;
+		}
+		return weekday;
 	}
 }
