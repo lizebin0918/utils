@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:int-ftp="http://www.springframework.org/schema/integration/ftp"
+	xmlns:int-jpa="http://www.springframework.org/schema/integration/jpa"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:jms="http://www.springframework.org/schema/integration/jms"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util" 
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+	http://www.springframework.org/schema/integration/ftp http://www.springframework.org/schema/integration/ftp/spring-integration-ftp.xsd
+	http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/integration/jpa http://www.springframework.org/schema/integration/jpa/spring-integration-jpa.xsd
+	http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd
+	http://www.springframework.org/schema/integration/jms	http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd"
+	default-autowire="byName">
+	<!-- 定时删除无用流程任务 -->
+	<import resource="actCancel/actCancel-timerTask.xml"/>
+	<!-- 清除两年以上的审核任务历史记录 -->	
+	<import resource="actHisDateClear/actHisDateClear-timerTask.xml"/>
+	<!-- 交易数据备份任务 -->
+	<import resource="dbBackup/dbBackup-timerTask.xml"/>
+	<!-- 日志文件备份任务 -->
+	<import resource="fileBackup/fileBackup-timerTask.xml"/>
+	<!-- 每日定时整理待核查交易（对账状态不明确的实时代收、代付交易）任务 -->
+	<import resource="txnCheck/txnCheck-timerTask.xml"/>
+	
+	
+	<int:channel id="chlDBBackupService">
+		<int:dispatcher failover="false" task-executor="reqServiceTaskExecutor"/>
+	</int:channel>
+	<int:gateway id="dBBackupGateway" service-interface="com.yjt.gcss.timerTask.DBBackupGateway" default-request-channel="chlDBBackupService">
+		<int:method name="submitBackupFile" request-channel="chlDBBackupService"/>
+	</int:gateway>
+	
+	<int:chain input-channel="chlDBBackupService" output-channel="chlDBBackupFTPOutput">
+		<int:service-activator ref="dBBackupService" method="processBackupService" />
+	</int:chain>
+	<int:channel id="chlDBBackupFTPOutput"/>
+	<!-- 文件FTP到备份机 begin -->
+	<int-ftp:outbound-channel-adapter  id="dbBackupFtpOutPut"
+				channel="chlDBBackupFTPOutput"
+				remote-file-separator="/"
+				auto-create-directory="true"
+				remote-directory="${dbBackup.ftp.remotePath}"
+				session-factory="ftpClientFactoryDBBackup"/>	
+	<bean id="ftpClientFactoryDBBackup" class="org.springframework.integration.ftp.session.DefaultFtpSessionFactory">
+		<property name="host" value="${dbBackup.ftp.host}"/>
+		<property name="port" value="${dbBackup.ftp.port}"/>
+		<property name="username" value="${dbBackup.ftp.userid}"/>
+		<property name="password" value="${dbBackup.ftp.password}"/>
+		<property name="clientMode" value="${dbBackup.ftp.clientMode}"/>
+	</bean>
+	<!-- 文件FTP到备份机 end -->
+</beans>

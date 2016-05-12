@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd 
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+	
+	<!-- 交易数据备份任务 配置开始(每天) -->
+	<bean id="monToSatDBBackupTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="monToSatDBBackupSchedulerJobDetail" />
+		<!-- 此处的触发时间无意义，统一由com.yjt.gcss.timerTask.TimerTaskInit初始化定时器任务时从数据库配置重新设置触发时间 -->
+		<property name="cronExpression">
+			<value>0 0 0 * * ? 2055</value>
+		</property>
+	</bean>
+	<bean id="monToSatDBBackupSchedulerJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="monToSatDBBackupTask" />
+		<property name="targetMethod" value="DBBackup" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="monToSatDBBackupTask" class="com.yjt.gcss.timerTask.dbBackup.MonToSatDBBackupTask">
+		<property name="triggerNameForTimerTaskResultAdvice" value="monToSatDBBackupTrigger" /><!-- 触发器名，用于定时任务执行结果登记（值应与CronTriggerBean的spring bean的id相同） -->
+		<property name="hibernateTransactionManager" ref="defaultTxManager"/>
+		<property name="dBBackupGateway" ref="dBBackupGateway"/>
+		<property name="dbBackupOptions">
+			<list>
+				<bean class="com.yjt.gcss.timerTask.dbBackup.DBBackupOption">
+					<property name="tableNames"><!-- 需要备份的表名（大小写敏感） -->
+						<list>
+							<value>INFO_MXCX_REQ</value>
+							<value>INFO_MXCX_RESULT</value>
+							<value>INFO_SSXY</value>
+							<value>INFO_YECX</value>
+							<value>TXN_PLDF_DETAIL</value>
+							<value>TXN_PLDS_DETAIL</value>
+							<value>TXN_SSDF</value>
+							<value>TXN_SSDS</value>
+							<value>TXN_SSDS_CZ</value>
+							<value>TXN_YQZZ</value>
+							<value>UI_BATCH_LOG</value>
+							<value>UI_MXCX_REQ</value>
+							<value>UI_MXCX_RESULT</value>
+							<value>UI_PLDF_DETAIL</value>
+							<value>UI_PLDS_DETAIL</value>
+							<value>UI_SSDF</value>
+							<value>UI_SSDS</value>
+							<value>UI_SSDS_CZ</value>
+							<value>UI_SSXY</value>
+							<value>UI_YECX</value>
+							<value>UI_YQZZ</value>
+						</list>
+					</property>
+					<property name="tableStructure" value="true" /><!-- 是否导出表结构 -->
+					<property name="clearOldData" value="false" /><!-- 是否清理旧数据 -->
+					<property name="backupFileName" value="${gcss.monToSatDBBackupTrigger.backupFileName}" /><!-- 备份后压缩包文件的绝对路径（系统自动添加时间戳并压缩） -->
+				</bean>
+			</list>
+		</property>
+	</bean>
+	<!-- 交易数据备份任务 配置结束(每天) -->
+	
+	<!-- 交易数据备份(每个月) -->
+	<bean id="monthDBBackupTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="monthDBBackupSchedulerJobDetail" />
+		<!-- 此处的触发时间无意义，统一由com.yjt.gcss.timerTask.TimerTaskInit初始化定时器任务时从数据库配置重新设置触发时间 -->
+		<property name="cronExpression">
+			<value>0 0 0 * * ? 2055</value>
+		</property>
+	</bean>
+	<bean id="monthDBBackupSchedulerJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="monthDBBackupTask" />
+		<property name="targetMethod" value="DBBackup" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="monthDBBackupTask" class="com.yjt.gcss.timerTask.dbBackup.MonthDBBackupTask">
+		<property name="triggerNameForTimerTaskResultAdvice" value="monthDBBackupTrigger" /><!-- 触发器名，用于定时任务执行结果登记（值应与CronTriggerBean的spring bean的id相同） -->
+		<property name="hibernateTransactionManager" ref="defaultTxManager"/>
+		<property name="dBBackupGateway" ref="dBBackupGateway"/>
+		<property name="dbBackupOptions">
+			<list>
+				<bean class="com.yjt.gcss.timerTask.dbBackup.DBBackupOption">
+				<property name="tableNames"><!-- 需要备份的表名（大小写敏感） -->
+						<list>
+							<value>INFO_MXCX_REQ</value>
+							<value>INFO_MXCX_RESULT</value>
+							<value>INFO_SSXY</value>
+							<value>INFO_YECX</value>
+							<value>TXN_PLDF_DETAIL</value>
+							<value>TXN_PLDS_DETAIL</value>
+							<value>TXN_SSDF</value>
+							<value>TXN_SSDS</value>
+							<value>TXN_SSDS_CZ</value>
+							<value>TXN_YQZZ</value>
+							<value>UI_BATCH_LOG</value>
+							<value>UI_MXCX_REQ</value>
+							<value>UI_MXCX_RESULT</value>
+							<value>UI_PLDF_DETAIL</value>
+							<value>UI_PLDS_DETAIL</value>
+							<value>UI_SSDF</value>
+							<value>UI_SSDS</value>
+							<value>UI_SSDS_CZ</value>
+							<value>UI_SSXY</value>
+							<value>UI_YECX</value>
+							<value>UI_YQZZ</value>
+						</list>
+					</property>
+					<property name="tableStructure" value="true" /><!-- 是否导出表结构 -->
+					<property name="clearOldData" value="true" /><!-- 是否清理旧数据 -->
+					<property name="monthsOfRetention" value="${gcss.dataClear.monthsOfRetention}" /><!-- 数据保留天数（需要清理旧数据时有效） -->
+					<property name="dateFiledNames"><!-- 时间字段名（大小写敏感）（目前只支持字符串的字段）（需要清理旧数据时有效） -->
+						<list>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+							<value>CREATE_DATE</value>
+						</list>
+					</property>
+					<property name="dateFiledFormats"><!-- 时间字段格式（需要清理旧数据时有效） -->
+						<list>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+							<value>yyyyMMdd</value>
+						</list>
+					</property>
+					<property name="backupFileName" value="${gcss.monthDBBackupTrigger.backupFileName}" /><!-- 备份后压缩包文件的绝对路径（系统自动添加时间戳并压缩） -->
+				</bean>
+			</list>
+		</property>
+	</bean>
+	<!-- 交易数据备份(每个月) -->
+	
+	<!-- 交易数据备份(每年) -->
+	<bean id="yearDBBackupTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="yearDBBackupSchedulerJobDetail" />
+		<!-- 此处的触发时间无意义，统一由com.yjt.gcss.timerTask.TimerTaskInit初始化定时器任务时从数据库配置重新设置触发时间 -->
+		<property name="cronExpression">
+			<value>0 0 0 * * ? 2055</value>
+		</property>
+	</bean>
+	<bean id="yearDBBackupSchedulerJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="yearDBBackupTask" />
+		<property name="targetMethod" value="DBBackup" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="yearDBBackupTask" class="com.yjt.gcss.timerTask.dbBackup.YearDBBackupTask">
+		<property name="triggerNameForTimerTaskResultAdvice" value="yearDBBackupTrigger" /><!-- 触发器名，用于定时任务执行结果登记（值应与CronTriggerBean的spring bean的id相同） -->
+		<property name="hibernateTransactionManager" ref="defaultTxManager"/>
+		<property name="dBBackupGateway" ref="dBBackupGateway"/>
+		<property name="dbBackupOptions">
+			<list>
+				<bean class="com.yjt.gcss.timerTask.dbBackup.DBBackupOption">
+					<property name="tableStructure" value="true" /><!-- 是否导出表结构 -->
+					<property name="clearOldData" value="false" /><!-- 是否清理旧数据 -->
+					<property name="backupFileName" value="${gcss.yearDBBackupTrigger.backupFileName}" /><!-- 备份后压缩包文件的绝对路径（系统自动添加时间戳并压缩） -->
+				</bean>
+			</list>
+		</property>
+		<property name="shellFile" value="${gcss.yearDBBackupTrigge.shellFile}"/> <!-- shell脚本 -->
+	</bean>
+	<!-- 交易数据备份(每年) -->
+</beans>
