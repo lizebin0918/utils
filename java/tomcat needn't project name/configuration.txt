@@ -1,0 +1,7 @@
+1.modify file:
+eclipse-/Servers/Tomcat v7.0 Server at localhost-config/server.xml
+apache-tomcat-7.0.55\conf\server.xml
+
+2.add content between <Host> and </Host>(project name is "onebuy")-chose one:
+<Context docBase="onebuy" path="/onebuy" reloadable="true" source="org.eclipse.jst.jee.server:onebuy"/>
+<Context docBase="/onebuy" path="" reloadable="true" source="org.eclipse.jst.jee.server:onebuy"/>

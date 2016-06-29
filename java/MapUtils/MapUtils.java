@@ -6,7 +6,7 @@ public class MapUtils {
 		m.put("a", 1);
 		m.put("b", 3);
 		m.put("c", 4);
-		m.put("d", "2");
+		//m.put("d", "2");
 		System.out.println(sortMapByValue(m, null));
 		System.out.println(m);
 	}
@@ -20,8 +20,8 @@ public class MapUtils {
 				public int compare(Entry<K, V> o1, Entry<K, V> o2) {
 					if(comparator == null) {
 						//两个 value 的类型是否一致，判断Value是否实现 Comparable 接口
-						if(
-								o1.getValue() instanceof Comparable
+						if(o1.getValue().getClass() == o2.getValue().getClass()
+								&& o1.getValue() instanceof Comparable
 								&& o2.getValue() instanceof Comparable) {
 							return ((Comparable)o1.getValue()).compareTo((Comparable)o2.getValue());
 						} else {
