@@ -29,7 +29,8 @@ public abstract class ZipUtils {
 
     private static final String CHARSET = "utf-8";
     public static final int BUFFER = 2048;
-    public static final String EXT = ".gz";
+    public static final String EXT_GZ = ".gz";
+    public static final String EXT_ZIP = ".zip";
 
     /**
      * 数据压缩
@@ -68,7 +69,7 @@ public abstract class ZipUtils {
      */
     public static void compressFileGZIP(File file, boolean delete) throws Exception {
         try (FileInputStream fis = new FileInputStream(file);
-             FileOutputStream fos = new FileOutputStream(file.getPath() + EXT);) {
+             FileOutputStream fos = new FileOutputStream(file.getPath() + EXT_GZ);) {
             compressFileGZIP(fis, fos);
             fos.flush();
             if (delete) {
@@ -157,7 +158,7 @@ public abstract class ZipUtils {
      */
     public static void decompressFileGZIP(File file, boolean delete) throws Exception {
         try (FileInputStream fis = new FileInputStream(file);
-             FileOutputStream fos = new FileOutputStream(file.getPath().replace(EXT, ""));) {
+             FileOutputStream fos = new FileOutputStream(file.getPath().replace(EXT_GZ, ""));) {
             decompressGZIP(fis, fos);
             fos.flush();
             if (delete) {
