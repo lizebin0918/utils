@@ -3,35 +3,65 @@
         <include refid="andStoreId" />
         <include refid="andBirthdayYear" />
         <include refid="andMemberFlag" />
-</select>
+    </select>
 
+    <!-- 省份城市过滤:参数类型(List<Map<String, List>>):[{"province":"广东","citys":["广州","江门","清远"]},{"province":"厦门","citys":["福建","福州"]}]-->
+    <!-- sql:and ( ( province = ? and citys in (?, ?, ?)) or ( province = ? ) ) -->
+    <sql id="andProvinceAndCity">
+        <if test="list != null and list.size != 0">
+            and
+            <foreach collection="list" index="index" item="value" open="(" close=")" separator=" or ">
+                (
+                province = #{value.province}
+                <if test="value.citys != null and value.citys.size != 0">
+                    AND city IN
+                    <foreach item="item" index="index" collection="value.citys" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                )
+            </foreach>
+        </if>
+    </sql>
 
-<!-- 省份城市过滤:参数类型(List<Map<String, List>>):[{"province":"广东","citys":["广州","江门","清远"]},{"province":"厦门","citys":["福建","福州"]}]-->
-<!-- sql:and ( ( province = ? and citys in (?, ?, ?)) or ( province = ? ) ) -->
-<sql id="andProvinceAndCity">
-    <if test="list != null and list.size != 0">
-        and
-        <foreach collection="list" index="index" item="value" open="(" close=")" separator=" or ">
-            (
-            province = #{value.province}
-            <if test="value.citys != null and value.citys.size != 0">
-                AND city IN
-                <foreach item="item" index="index" collection="value.citys" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-            )
-        </foreach>
-    </if>
-</sql>
+    <!-- 门店过滤:参数类型(int[])-->
+    <!--and store_id IN ( ? )-->
+    <sql id="andStoreId">
+        <if test="storeIds != null and storeIds.length != 0">
+            AND store_id IN
+            <foreach item="item" index="index" collection="storeIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </sql>
 
-<!--会员标识:{-1:"全部",0:"非会员",1:"会员"}-->
-<sql id="andMemberFlag">
-    <if test='memberFlag != null and "0".equals(memberFlag)'>
-    <if test='memberFlag != null and memberFlag == 0'>
-        and length(ifnull(card_no, "")) = 0
-    </if>
-    <if test='memberFlag != null and "1".equals(memberFlag)'>
-        and length(ifnull(card_no, "")) > 0
-    </if>
-</sql>
+    <!--出生年份过滤:参数类型(String)-->
+    <sql id="andBirthdayYear">
+        <if test="minBirth_yyyy != null">
+            AND DATE_FORMAT(birthday, '%Y') &gt;= #{minBirth_yyyy}
+        </if>
+        <if test="maxBirth_yyyy != null">
+            AND DATE_FORMAT(birthday, '%Y') &lt;= #{maxBirth_yyyy}
+        </if>
+    </sql>
+
+    <!--出生年月过滤:参数类型(String)-->
+    <sql id="andBirthdayMMdd">
+        <if test="minBirthMM_dd != null">
+            AND DATE_FORMAT(birthday, '%m-%d') &gt;= #{minBirthMM_dd}
+        </if>
+        <if test="maxBirth_yyyy != null">
+            AND DATE_FORMAT(birthday, '%m-%d') &lt;= #{maxBirthMM_dd}
+        </if>
+    </sql>
+
+    <!--会员标识:{-1:"全部",0:"非会员",1:"会员"}-->
+    <sql id="andMemberFlag">
+        <if test='memberFlag != null and "0".equals(memberFlag)'>
+        <if test='memberFlag != null and memberFlag == 0'>
+            and length(ifnull(card_no, "")) = 0
+        </if>
+        <if test='memberFlag != null and "1".equals(memberFlag)'>
+            and length(ifnull(card_no, "")) > 0
+        </if>
+    </sql>
