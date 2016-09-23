@@ -27,7 +27,7 @@ public void test12() {
     try {
         testService.validationId(new Integer(3), "123", new String());
     } catch (ConstraintViolationException e) {
-        log.error(e.getMessage(), e);
+        log.error("数据不合法", e);
     }
 }
 
