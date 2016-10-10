@@ -1,7 +1,7 @@
 package com.lzb.redpackage;
 
 import java.util.Arrays;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.Assert;
 
@@ -13,7 +13,15 @@ import org.junit.Assert;
  */
 public class RedPacketUtils {
 
-	private static final Random random = new Random();
+	/*Random.nextInt()的确是线程安全，但是对于高并发的情况，使用ThreadLocalRandom效率更高*/
+	//private static final Random random = new Random();
+	/*
+	Normally to generate Random numbers, we either do Create an instance of java.util.Random OR Math.random() - which internally creates an instance of java.util.Random on first invocation. However in a concurrent applications usage of above leads to contention issues
+	Random is thread safe for use by multiple threads. But if multiple threads use the same instance of Random, the same seed is shared by multiple threads. It leads to contention between multiple threads and so to performance degradation.
+	ThreadLocalRandom is solution to above problem. ThreadLocalRandom has a Random instance per thread and safeguards against contention.
+	*/
+	private static final ThreadLocalRandom random = ThreadLocalRandom.current();
+
 	
 	/**
 	 * @param moneyForFen 以分为单位的金额
@@ -36,7 +44,7 @@ public class RedPacketUtils {
 		for(int i=0; i<size - 1; i++) {
 			//随机数规则:
 			//moneyForFen - (size - 1 -i) * min // 剩下的钱足够分给剩下的人，最少应该是：剩下人数 * min
-			int _r1 = random.nextInt(moneyForFen - (size - 1 - i) * min);
+			int _r1 = random.nextInt(0, moneyForFen - (size - 1 - i) * min);
 			//2.上述产生的随机数再除以一个在红包数之间的因子
 			int _r2 = 1 + random.nextInt(size);
 			int _r3 = _r1 / _r2;
