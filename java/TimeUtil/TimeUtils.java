@@ -21,11 +21,11 @@ public final class TimeUtils {
 	}
 
     /**
-     * 格式为:yyyyMMddHHmmss
+     * 格式为:yyyyMMddHHmmssSSS
      */
     public static final String DATE_FORMAT_yyyyMMddHHmmssSSS = "yyyyMMddHHmmssSSS";
     /**
-     * 格式为:yyyy-MM-dd HH:mm:ss
+     * 格式为:yyyy-MM-dd HH:mm:ss.SSS
      */
     public static final String DATE_FORMAT_yyyy_MM_dd_HH_mm_ss_SSS = "yyyy-MM-dd HH:mm:ss.SSS";
     /**
@@ -93,7 +93,7 @@ public final class TimeUtils {
      */
     public static final String DATE_FORMAT_MMdd = "MMdd";
 
-    private static final Map<String, DateTimeFormatter> DATE_FORMAT_MAPPING = new HashMap<String, DateTimeFormatter>(20);
+    private static final Map<String, DateTimeFormatter> DATE_FORMAT_MAPPING = new HashMap<String, DateTimeFormatter>(50);
 
     static {
         DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyyMMddHHmmssSSS, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyyMMddHHmmssSSS));
@@ -697,7 +697,7 @@ public final class TimeUtils {
      * Created on : 2016-09-07 20:16
      * @author lizebin
      * @version V1.0.0
-     * @param null
+     * @param timeMillis
      * @return
      */
     public static LocalDateTime timeMillisToDate(long timeMillis) {
@@ -731,7 +731,7 @@ public final class TimeUtils {
      * Created on : 2016-09-18 15:43
      * @author lizebin
      * @version V1.0.0
-     * @param null
+     * @param value
      * @return
      */
     public static long dateToTimeMillis(Date value) {
@@ -749,7 +749,7 @@ public final class TimeUtils {
      * Created on : 2016-09-18 15:43
      * @author lizebin
      * @version V1.0.0
-     * @param null
+     * @param value
      * @return
      */
     public static long dateToTimeMillis(LocalDate value) {
@@ -764,7 +764,7 @@ public final class TimeUtils {
      * Created on : 2016-09-18 15:43
      * @author lizebin
      * @version V1.0.0
-     * @param null
+     * @param value
      * @return
      */
     public static long dateToTimeMillis(LocalTime value) {
@@ -779,7 +779,7 @@ public final class TimeUtils {
      * Created on : 2016-09-18 15:43
      * @author lizebin
      * @version V1.0.0
-     * @param null
+     * @param value
      * @return
      */
     public static long dateToTimeMillis(LocalDateTime value) {
@@ -792,7 +792,7 @@ public final class TimeUtils {
     /**
      * 格式日期转换
      *
-     * @param date
+     * @param timeMillis 时间戳
      * @param dateFormat
      * @return
      */
@@ -805,11 +805,33 @@ public final class TimeUtils {
      * Created on : 2016-09-19 18:18
      * @author lizebin
      * @version V1.0.0
-     * @param null
-     * @return 
+     * @param temporal
+     * @param dateFormat
+     * @return
      */
     public static String dateFormat(Temporal temporal, String dateFormat) {
         return DATE_FORMAT_MAPPING.get(dateFormat).format(temporal);
     }
 
+    /**
+     * 获取时间戳（毫秒为单位）<br/>
+     * Created on : 2016-10-14 13:52
+     * @author lizebin
+     * @version V1.0.0
+     * @return
+     */
+    public static long getTimeMillis() {
+        return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    /**
+     * 获取时间戳（秒为单位）<br/>
+     * Created on : 2016-10-14 13:52
+     * @author lizebin
+     * @version V1.0.0
+     * @return
+     */
+    public static long getTimeSecond() {
+        return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
+    }
 }
