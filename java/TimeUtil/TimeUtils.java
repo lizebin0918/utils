@@ -116,38 +116,27 @@ public final class TimeUtils {
         DATE_FORMAT_MAPPING.put(DATE_FORMAT_MM_dd, DateTimeFormatter.ofPattern(DATE_FORMAT_MM_dd));
     }
 
-	private static final ThreadLocal<Map<String, InnerSimpleDateFormat>> innerVariables = new ThreadLocal<Map<String, InnerSimpleDateFormat>>();
+    /*线程变量:{"dateFormat":DateFormat}*/
+	private static final ThreadLocal<Map<String, SimpleDateFormat>> innerVariables = new ThreadLocal<>();
 	
-	//fixed a bug
-	private static InnerSimpleDateFormat getSimpleDateFormatInstance(final String pattern) {
-		Map<String, InnerSimpleDateFormat> sdfMap = innerVariables.get();
+	private static SimpleDateFormat getDateFormatInstance(final String pattern) {
+		Map<String, SimpleDateFormat> sdfMap = innerVariables.get();
 		if(sdfMap == null) {
-			sdfMap = new HashMap<String, InnerSimpleDateFormat>(2);
+			sdfMap = new HashMap<>();
 			innerVariables.set(sdfMap);
 		}
-		InnerSimpleDateFormat sdf = sdfMap.get(pattern);
+        SimpleDateFormat sdf = sdfMap.get(pattern);
 		if (sdf == null) {
-			sdf = new InnerSimpleDateFormat(pattern);
+			sdf = new SimpleDateFormat(pattern) {
+                {
+                    super.applyPattern(pattern);
+                }
+                @Override
+                public void applyPattern(String pattern) {}//sdfMap存储了{"日期格式":DateFormat},所以DateFormat.applyPattern()不可用
+            };
 			sdfMap.put(pattern, sdf);
 		}
 		return sdf;
-	}
-	
-	private static class InnerSimpleDateFormat extends SimpleDateFormat {
-		
-		private static final long serialVersionUID = 1L;
-
-		public InnerSimpleDateFormat(String pattern) {
-			super(pattern);
-		}
-		
-		/* 
-		 * SimpleDateFormat 在使用的过程中，禁止转换格式
-		 * (non-Javadoc)
-		 * @see java.text.SimpleDateFormat#applyPattern(java.lang.String)
-		 */
-		@Deprecated
-		public void applyPattern(String pattern) {}
 	}
 	
 	/**
@@ -172,7 +161,7 @@ public final class TimeUtils {
 				month = month + 12;
 			}
 			calendar.set(year, month, 1, 0, 0, 0);
-			InnerSimpleDateFormat sdf = getSimpleDateFormatInstance("yyyyMM");
+            SimpleDateFormat sdf = getDateFormatInstance("yyyyMM");
 			result = sdf.format(new Date(calendar.getTime().getTime()));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -200,7 +189,7 @@ public final class TimeUtils {
 			}
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(year, month, 1, 0, 0, 0);
-			InnerSimpleDateFormat sdf = getSimpleDateFormatInstance(outputFormat);
+            SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
 			result = sdf.format(new Date(calendar.getTime().getTime() - 1000));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -224,7 +213,7 @@ public final class TimeUtils {
 			int month = Integer.parseInt(tmp.substring(4, 6));
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(year, month - 1, 1, 0, 0, 0);
-			InnerSimpleDateFormat sdf = getSimpleDateFormatInstance(outputFormat);
+			SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
 			result = sdf.format(new Date(
 					calendar.getTime().getTime() - 1000));
 		} catch (Exception e) {
@@ -253,7 +242,7 @@ public final class TimeUtils {
 			}
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(year, month, 1, 0, 0, 0);
-			InnerSimpleDateFormat sdf = getSimpleDateFormatInstance(outputFormat);
+            SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
 			result = sdf.format(calendar.getTime());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -276,7 +265,7 @@ public final class TimeUtils {
 			int month = Integer.parseInt(tmp.substring(4, 6));
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(year, month - 1, 1, 0, 0, 0);
-			InnerSimpleDateFormat sdf = getSimpleDateFormatInstance(outputFormat);
+            SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
 			result = sdf.format(calendar.getTime());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -297,7 +286,7 @@ public final class TimeUtils {
 			if (date == null)
 				result = "";
 			else {
-				SimpleDateFormat sdf = getSimpleDateFormatInstance(format);
+				SimpleDateFormat sdf = getDateFormatInstance(format);
 				result = sdf.format(date);
 			}
 		} catch (Exception e) {
@@ -316,7 +305,7 @@ public final class TimeUtils {
 	public static Date strTimeToDate(String date, String format) {
 		Date result = null;
 		try {
-			InnerSimpleDateFormat sdf = getSimpleDateFormatInstance(format);
+            SimpleDateFormat sdf = getDateFormatInstance(format);
 			result = sdf.parse(date);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -339,9 +328,9 @@ public final class TimeUtils {
 			if (date == null || date.equals(""))
 				return "";
 			else {
-				InnerSimpleDateFormat sdf = getSimpleDateFormatInstance(oldFormat);
+                SimpleDateFormat sdf = getDateFormatInstance(oldFormat);
 				Date tmp = sdf.parse(date);
-				sdf = getSimpleDateFormatInstance(newFormat);
+				sdf = getDateFormatInstance(newFormat);
 				result = sdf.format(tmp);
 			}
 		} catch (Exception e) {
@@ -357,7 +346,7 @@ public final class TimeUtils {
 	 * 得到当前日期
 	 **/
 	public static String getCurDate(String dateFormat) {
-		InnerSimpleDateFormat sdf = getSimpleDateFormatInstance(dateFormat);
+        SimpleDateFormat sdf = getDateFormatInstance(dateFormat);
 		Calendar c1 = Calendar.getInstance(); // today
 		return sdf.format(c1.getTime());
 	}
@@ -378,7 +367,9 @@ public final class TimeUtils {
 	
 	/**
 	 * 获取当周第一天，周一作为一个星期的第一天
-	 * @param date
+	 * @param today
+	 * @param inputDateFormat
+	 * @param outputDateFormat
 	 * @return
 	 */
 	public static String getFirstDayOfWeek(String today, String inputDateFormat, String outputDateFormat) {
@@ -393,7 +384,9 @@ public final class TimeUtils {
 	
 	/**
 	 * 获取当周最后一天，周日为一个星期的最后一天
-	 * @param date
+	 * @param today
+	 * @param inputDateFormat
+	 * @param outputDateFormat
 	 * @return
 	 */
 	public static String getLastDayOfWeek(String today, String inputDateFormat, String outputDateFormat) {
@@ -414,7 +407,7 @@ public final class TimeUtils {
 	 * @return
 	 */
 	public static Date changeStrToDate(String date, String format) {
-		InnerSimpleDateFormat sf = getSimpleDateFormatInstance(format);
+        SimpleDateFormat sf = getDateFormatInstance(format);
 		Date dt = null;
 		try {
 			dt = sf.parse(date);
@@ -437,7 +430,7 @@ public final class TimeUtils {
 		}
 
 		try {
-			InnerSimpleDateFormat dateFormat = getSimpleDateFormatInstance(format);
+            SimpleDateFormat dateFormat = getDateFormatInstance(format);
 			Date formatDate = dateFormat.parse(date);
 			return changeStrTimeFormat(date, format, format).equals(dateFormat.format(formatDate));
 		} catch (ParseException e) {
@@ -486,11 +479,11 @@ public final class TimeUtils {
 	}
 
 	/**
-	 * 获取时间date1与date2相差的天数数
+	 * 获取时间startDate与endDate相差的天数数(endDate - startDate)
 	 * 
-	 * @param date1
+	 * @param startDate
 	 *            起始时间
-	 * @param date2
+	 * @param endDate
 	 *            结束时间
 	 * @return 返回相差的天数
 	 */
@@ -551,7 +544,7 @@ public final class TimeUtils {
 	/**
 	 * 时间计算 +(-)N小时
 	 * @param date
-	 * @param minute
+	 * @param hour
 	 * @return
 	 */
 	public static Date rollHour(Date date, int hour){
@@ -722,8 +715,8 @@ public final class TimeUtils {
      * @param endDatetime   结束时间
      * @return 返回相差的月数
      */
-    public static long getOffsetBetweenDate(ChronoUnit units, LocalDateTime startDate, LocalDateTime endDate) {
-        return units.between(startDate, endDate);
+    public static long getOffsetBetweenDate(ChronoUnit units, LocalDateTime startDatetime, LocalDateTime endDatetime) {
+        return units.between(startDatetime, endDatetime);
     }
 
     /**
@@ -833,5 +826,14 @@ public final class TimeUtils {
      */
     public static long getTimeSecond() {
         return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
+    }
+
+    /**
+     * Date 转换成 LocalDateTime
+     * @param date
+     * @return
+     */
+    public static LocalDateTime dateToLocalDateTime(Date date) {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 }

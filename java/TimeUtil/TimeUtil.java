@@ -62,32 +62,27 @@ ppublic final class TimeUtil {
 
 	private static final ThreadLocal<WeakHashMap<String, InnerSimpleDateFormat>> innerVariables = new ThreadLocal<WeakHashMap<String, InnerSimpleDateFormat>>();
 	
-	//fixed a bug
-	private static InnerSimpleDateFormat getSimpleDateFormatInstance(final String pattern) {
-		Map<String, InnerSimpleDateFormat> sdfMap = innerVariables.get();
+	/*线程变量:{"dateFormat":DateFormat}*/
+	private static final ThreadLocal<Map<String, SimpleDateFormat>> innerVariables = new ThreadLocal<>();
+	
+	private static SimpleDateFormat getDateFormatInstance(final String pattern) {
+		Map<String, SimpleDateFormat> sdfMap = innerVariables.get();
 		if(sdfMap == null) {
-			//采用 HashMap 会导致内存溢出
-			sdfMap = new WeakHashMap<String, InnerSimpleDateFormat>(2);
+			sdfMap = new HashMap<>();
 			innerVariables.set(sdfMap);
 		}
-		InnerSimpleDateFormat sdf = sdfMap.get(pattern);
+        SimpleDateFormat sdf = sdfMap.get(pattern);
 		if (sdf == null) {
-			sdf = new InnerSimpleDateFormat(pattern);
+			sdf = new SimpleDateFormat(pattern) {
+                {
+                    super.applyPattern(pattern);
+                }
+                @Override
+                public void applyPattern(String pattern) {}//sdfMap存储了{"日期格式":DateFormat},所以DateFormat.applyPattern()不可用
+            };
 			sdfMap.put(pattern, sdf);
 		}
 		return sdf;
-	}
-	
-	private static class InnerSimpleDateFormat extends SimpleDateFormat {
-		
-		private static final long serialVersionUID = 1L;
-
-		public InnerSimpleDateFormat(String pattern) {
-			super(pattern);
-		}
-		
-		@Deprecated
-		public void applyPattern(String pattern) {}
 	}
 	
 	/**
