@@ -20,112 +20,114 @@ public final class TimeUtils {
 		throw new Error("Don't instance" + TimeUtils.class.getName());
 	}
 
-    /**
-     * 格式为:yyyyMMddHHmmssSSS
-     */
-    public static final String DATE_FORMAT_yyyyMMddHHmmssSSS = "yyyyMMddHHmmssSSS";
-    /**
-     * 格式为:yyyy-MM-dd HH:mm:ss.SSS
-     */
-    public static final String DATE_FORMAT_yyyy_MM_dd_HH_mm_ss_SSS = "yyyy-MM-dd HH:mm:ss.SSS";
-    /**
-     * 格式为:yyyyMMddHHmmss
-     */
-    public static final String DATE_FORMAT_yyyyMMddHHmmss = "yyyyMMddHHmmss";
-    /**
-     * 格式为:yyyy-MM-dd HH:mm:ss
-     */
-    public static final String DATE_FORMAT_yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
-    /**
-     * 格式为:HHmmss
-     */
-    public static final String DATE_FORMAT_HHmmss = "HHmmss";
-    /**
-     * 格式为:HH:mm:ss
-     */
-    public static final String DATE_FORMAT_HH_mm_ss = "HH:mm:ss";
-    /**
-     * 格式为:yyyyMMdd
-     */
-    public static final String DATE_FORMAT_yyyyMMdd = "yyyyMMdd";
-    /**
-     * 格式为:yyyy-MM-dd
-     */
-    public static final String DATE_FORMAT_yyyy_MM_dd = "yyyy-MM-dd";
-    /**
-     * 格式为:yyyy-MM-dd HH:mm
-     */
-    public static final String DATE_FORMAT_yyyy_MM_dd_HH_mm = "yyyy-MM-dd HH:mm";
-    /**
-     * 格式为:yyyyMMddHHmm
-     */
-    public static final String DATE_FORMAT_yyyyMMddHHmm = "yyyyMMddHHmm";
-    /**
-     * 格式为:yyyy-MM-dd HH
-     */
-    public static final String DATE_FORMAT_yyyy_MM_dd_HH = "yyyy-MM-dd HH";
-    /**
-     * 格式为:yyyyMMddHH
-     */
-    public static final String DATE_FORMAT_yyyyMMddHH = "yyyyMMddHH";
-    /**
-     * 格式为:yyyy-MM
-     */
-    public static final String DATE_FORMAT_yyyy_MM = "yyyy-MM";
-    /**
-     * 格式为:yyyyMM
-     */
-    public static final String DATE_FORMAT_yyyyMM = "yyyyMM";
-    /**
-     * 格式为:HH:mm
-     */
-    public static final String DATE_FORMAT_HH_mm = "HH:mm";
-    /**
-     * 格式为:HHmm
-     */
-    public static final String DATE_FORMAT_HHmm = "HHmm";
-    /**
-     * 格式为:MM:dd
-     */
-    public static final String DATE_FORMAT_MM_dd = "MM:dd";
-    /**
-     * 格式为:MMdd
-     */
-    public static final String DATE_FORMAT_MMdd = "MMdd";
+	public enum DATE_FORMAT {
+        /**
+         * 格式为:yyyyMMddHHmmssSSS
+         */
+        yyyyMMddHHmmssSSS("yyyyMMddHHmmssSSS"),
+        /**
+         * 格式为:yyyy-MM-dd HH:mm:ss.SSS
+         */
+        yyyy_MM_dd_HH_mm_ss_SSS("yyyy-MM-dd HH:mm:ss.SSS"),
+        /**
+         * 格式为:yyyyMMddHHmmss
+         */
+        yyyyMMddHHmmss("yyyyMMddHHmmss"),
+        /**
+         * 格式为:yyyy-MM-dd HH:mm:ss
+         */
+        yyyy_MM_dd_HH_mm_ss("yyyy-MM-dd HH:mm:ss"),
+        /**
+         * 格式为:HHmmss
+         */
+        HHmmss("HHmmss"),
+        /**
+         * 格式为:HH:mm:ss
+         */
+        HH_mm_ss("HH:mm:ss"),
+        /**
+         * 格式为:yyyyMMdd
+         */
+        yyyyMMdd("yyyyMMdd"),
+        /**
+         * 格式为:yyyy-MM-dd
+         */
+        yyyy_MM_dd("yyyy-MM-dd"),
+        /**
+         * 格式为:yyyy-MM-dd HH:mm
+         */
+        yyyy_MM_dd_HH_mm("yyyy-MM-dd HH:mm"),
+        /**
+         * 格式为:yyyyMMddHHmm
+         */
+        yyyyMMddHHmm("yyyyMMddHHmm"),
+        /**
+         * 格式为:yyyy-MM-dd HH
+         */
+        yyyy_MM_dd_HH("yyyy-MM-dd HH"),
+        /**
+         * 格式为:yyyyMMddHH
+         */
+        yyyyMMddHH("yyyyMMddHH"),
+        /**
+         * 格式为:yyyy-MM
+         */
+        yyyy_MM("yyyy-MM"),
+        /**
+         * 格式为:yyyyMM
+         */
+        yyyyMM("yyyyMM"),
+        /**
+         * 格式为:HH:mm
+         */
+        HH_mm("HH:mm"),
+        /**
+         * 格式为:HHmm
+         */
+        HHmm("HHmm"),
+        /**
+         * 格式为:MM:dd
+         */
+        MM_dd("MM:dd"),
+        /**
+         * 格式为:MMdd
+         */
+        MMdd("MMdd"),
+        /**
+         * 年份
+         */
+        yyyy("yyyy"),
+        /**
+         * 月份
+         */
+        MM("MM"),
+        dd("dd"),
+        HH("HH"),
+        mm("mm"),
+        ss("ss");
 
-    private static final Map<String, DateTimeFormatter> DATE_FORMAT_MAPPING = new HashMap<String, DateTimeFormatter>(50);
+        private String format;
+        DATE_FORMAT(String format) {
+            this.format = format;
+        }
 
-    static {
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyyMMddHHmmssSSS, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyyMMddHHmmssSSS));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyyMMddHHmmss, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyyMMddHHmmss));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyy_MM_dd_HH_mm_ss, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd_HH_mm_ss));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyy_MM_dd_HH_mm_ss_SSS, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd_HH_mm_ss_SSS));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyyMMddHHmm, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyyMMddHHmm));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyy_MM_dd_HH_mm, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd_HH_mm));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyyMMddHH, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyyMMddHH));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyy_MM_dd_HH, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd_HH));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyyMMdd, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyyMMdd));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyy_MM_dd, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyyMM, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyyMM));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_yyyy_MM, DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_HHmmss, DateTimeFormatter.ofPattern(DATE_FORMAT_HHmmss));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_HH_mm_ss, DateTimeFormatter.ofPattern(DATE_FORMAT_HH_mm_ss));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_HHmm, DateTimeFormatter.ofPattern(DATE_FORMAT_HHmm));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_HH_mm, DateTimeFormatter.ofPattern(DATE_FORMAT_HH_mm));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_MMdd, DateTimeFormatter.ofPattern(DATE_FORMAT_MMdd));
-        DATE_FORMAT_MAPPING.put(DATE_FORMAT_MM_dd, DateTimeFormatter.ofPattern(DATE_FORMAT_MM_dd));
+        public String getFormat() {
+            return format;
+        }
+
     }
 
     /*线程变量:{"dateFormat":DateFormat}*/
-	private static final ThreadLocal<Map<String, SimpleDateFormat>> innerVariables = new ThreadLocal<>();
+	private static final ThreadLocal<EnumMap<DATE_FORMAT, SimpleDateFormat>> innerVariables = new ThreadLocal<>();
 	
-	private static SimpleDateFormat getDateFormatInstance(final String pattern) {
-		Map<String, SimpleDateFormat> sdfMap = innerVariables.get();
+	private static SimpleDateFormat getDateFormatInstance(final DATE_FORMAT format) {
+		EnumMap<DATE_FORMAT, SimpleDateFormat> sdfMap = innerVariables.get();
 		if(sdfMap == null) {
-			sdfMap = new HashMap<>();
+			sdfMap = new EnumMap<>(DATE_FORMAT.class);
 			innerVariables.set(sdfMap);
 		}
-        SimpleDateFormat sdf = sdfMap.get(pattern);
+        SimpleDateFormat sdf = sdfMap.get(format);
+        String pattern = format.getFormat();
 		if (sdf == null) {
 			sdf = new SimpleDateFormat(pattern) {
                 {
@@ -134,10 +136,16 @@ public final class TimeUtils {
                 @Override
                 public void applyPattern(String pattern) {}//sdfMap存储了{"日期格式":DateFormat},所以DateFormat.applyPattern()不可用
             };
-			sdfMap.put(pattern, sdf);
+			sdfMap.put(format, sdf);
 		}
 		return sdf;
 	}
+
+    /**
+     * 最小的年月日-1970-01-01 00:00:00(Date d = new Date(0L))
+     * UTC：格林威治时间1970年01月01日00时00分00秒（UTC+8北京时间1970年01月01日08时00分00秒）
+     */
+    private static final LocalDateTime MIN_LOCAL_DATE_TIME = LocalDateTime.of(1970, 1, 1, 0, 0, 0, 0);
 	
 	/**
 	 * 返回当月月份前n个月份的年月
@@ -146,26 +154,20 @@ public final class TimeUtils {
 	 * @param n
 	 * @return
 	 */
-	public static String getPreMonthReturnYearMonth(String today,
-			String format, int n) {
+	public static String getPreMonthReturnYearMonth(String today, DATE_FORMAT format, int n) {
 		String result = null;
-		try {
-			String tmp = changeStrTimeFormat(today, format,
-					DATE_FORMAT_yyyyMMdd);
-			int year = Integer.parseInt(tmp.substring(0, 4));
-			int month = Integer.parseInt(tmp.substring(4, 6));
-			Calendar calendar = Calendar.getInstance();
-			month = month - n - 1;
-			if (month < 0) {
-				year = year - 1;
-				month = month + 12;
-			}
-			calendar.set(year, month, 1, 0, 0, 0);
-            SimpleDateFormat sdf = getDateFormatInstance("yyyyMM");
-			result = sdf.format(new Date(calendar.getTime().getTime()));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        String tmp = changeStrTimeFormat(today, format, DATE_FORMAT.yyyyMMdd);
+        int year = Integer.parseInt(tmp.substring(0, 4));
+        int month = Integer.parseInt(tmp.substring(4, 6));
+        Calendar calendar = Calendar.getInstance();
+        month = month - n - 1;
+        if (month < 0) {
+            year = year - 1;
+            month = month + 12;
+        }
+        calendar.set(year, month, 1, 0, 0, 0);
+        SimpleDateFormat sdf = getDateFormatInstance(DATE_FORMAT.yyyyMM);
+        result = sdf.format(new Date(calendar.getTime().getTime()));
 		return result;
 	}
 
@@ -175,12 +177,11 @@ public final class TimeUtils {
 	 * @param today
 	 * @return
 	 */
-	public static String getLastDayOfMonth(String today,
-			String inputFormat, String outputFormat) {
+	public static String getLastDateOfMonth(String today, DATE_FORMAT inputFormat, DATE_FORMAT outputFormat) {
 		String result = null;
 		try {
 			String tmp = changeStrTimeFormat(today, inputFormat,
-					DATE_FORMAT_yyyyMMdd);
+                                             DATE_FORMAT.yyyyMMdd);
 			int year = Integer.parseInt(tmp.substring(0, 4));
 			int month = Integer.parseInt(tmp.substring(4, 6));
 			if (month == 12) {
@@ -203,23 +204,14 @@ public final class TimeUtils {
 	 * @param today
 	 * @return
 	 */
-	public static String getPreMonthLastDate(String today, String inputFormat,
-			String outputFormat) {
-		String result = null;
-		try {
-			String tmp = changeStrTimeFormat(today, inputFormat,
-					DATE_FORMAT_yyyyMMdd);
-			int year = Integer.parseInt(tmp.substring(0, 4));
-			int month = Integer.parseInt(tmp.substring(4, 6));
-			Calendar calendar = Calendar.getInstance();
-			calendar.set(year, month - 1, 1, 0, 0, 0);
-			SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
-			result = sdf.format(new Date(
-					calendar.getTime().getTime() - 1000));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
+	public static String getPreMonthLastDate(String today, DATE_FORMAT inputFormat, DATE_FORMAT outputFormat) {
+        String tmp = changeStrTimeFormat(today, inputFormat, DATE_FORMAT.yyyyMMdd);
+        int year = Integer.parseInt(tmp.substring(0, 4));
+        int month = Integer.parseInt(tmp.substring(4, 6));
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month - 1, 0);
+        SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
+        return sdf.format(new Date(calendar.getTime().getTime()));
 	}
 
 	/**
@@ -228,26 +220,17 @@ public final class TimeUtils {
 	 * @param today
 	 * @return
 	 */
-	public static String getNextMonthFirstDate(String today,
-			String inputFormat, String outputFormat) {
-		String result = null;
-		try {
-			String tmp = changeStrTimeFormat(today, inputFormat,
-					DATE_FORMAT_yyyyMMdd);
-			int year = Integer.parseInt(tmp.substring(0, 4));
-			int month = Integer.parseInt(tmp.substring(4, 6));
-			if (month == 12) {
-				year = year + 1;
-				month = 0;
-			}
-			Calendar calendar = Calendar.getInstance();
-			calendar.set(year, month, 1, 0, 0, 0);
-            SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
-			result = sdf.format(calendar.getTime());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
+	public static String getNextMonthFirstDate(String today, DATE_FORMAT inputFormat, DATE_FORMAT outputFormat) {
+        String tmp = changeStrTimeFormat(today, inputFormat, DATE_FORMAT.yyyyMMdd);
+        int year = Integer.parseInt(tmp.substring(0, 4));
+        int month = Integer.parseInt(tmp.substring(4, 6));
+        if (month == 12) {
+            year = year + 1;
+            month = 0;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, 1);
+        return getDateFormatInstance(outputFormat).format(calendar.getTime());
 	}
 
 	/**
@@ -256,21 +239,15 @@ public final class TimeUtils {
 	 * @param today
 	 * @return
 	 */
-	public static String getFirstDayOfMonth(String today,
-			String inputFormat, String outputFormat) {
-		String result = null;
-		try {
-			String tmp = DATE_FORMAT_yyyyMMdd.equals(inputFormat) ? today : changeStrTimeFormat(today, inputFormat, DATE_FORMAT_yyyyMMdd);
-			int year = Integer.parseInt(tmp.substring(0, 4));
-			int month = Integer.parseInt(tmp.substring(4, 6));
-			Calendar calendar = Calendar.getInstance();
-			calendar.set(year, month - 1, 1, 0, 0, 0);
-            SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
-			result = sdf.format(calendar.getTime());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
+	public static String getFirstDateOfMonth(String today,
+                                             DATE_FORMAT inputFormat, DATE_FORMAT outputFormat) {
+        String tmp = DATE_FORMAT.yyyyMMdd.equals(inputFormat) ? today : changeStrTimeFormat(today, inputFormat, DATE_FORMAT.yyyyMMdd);
+        int year = Integer.parseInt(tmp.substring(0, 4));
+        int month = Integer.parseInt(tmp.substring(4, 6));
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month - 1, 1, 0, 0, 0);
+        SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
+        return sdf.format(calendar.getTime());
 	}
 
 	/**
@@ -280,37 +257,8 @@ public final class TimeUtils {
 	 * @param format
 	 * @return
 	 */
-	public static String dateFormat(Date date, String format) {
-		String result = null;
-		try {
-			if (date == null)
-				result = "";
-			else {
-				SimpleDateFormat sdf = getDateFormatInstance(format);
-				result = sdf.format(date);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
-
-	/**
-	 * 字符串日期转换成Date型日期
-	 * 
-	 * @param date
-	 * @param format
-	 * @return
-	 */
-	public static Date strTimeToDate(String date, String format) {
-		Date result = null;
-		try {
-            SimpleDateFormat sdf = getDateFormatInstance(format);
-			result = sdf.parse(date);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
+	public static String dateFormat(Date date, DATE_FORMAT format) {
+        return getDateFormatInstance(format).format(date);
 	}
 
 	/**
@@ -321,48 +269,15 @@ public final class TimeUtils {
 	 * @param newFormat
 	 * @return
 	 */
-	public static String changeStrTimeFormat(String date, String oldFormat,
-			String newFormat) {
-		String result = null;
-		try {
-			if (date == null || date.equals(""))
-				return "";
-			else {
-                SimpleDateFormat sdf = getDateFormatInstance(oldFormat);
-				Date tmp = sdf.parse(date);
-				sdf = getDateFormatInstance(newFormat);
-				result = sdf.format(tmp);
-			}
-		} catch (Exception e) {
-			// e.printStackTrace();
-		}
-		if (result == null) {
-			return "";
-		}
-		return result;
+	public static String changeStrTimeFormat(String date, DATE_FORMAT oldFormat, DATE_FORMAT newFormat) {
+        return getDateFormatInstance(newFormat).format(strTimeToDate(date, oldFormat));
 	}
 
 	/**
 	 * 得到当前日期
 	 **/
-	public static String getCurDate(String dateFormat) {
-        SimpleDateFormat sdf = getDateFormatInstance(dateFormat);
-		Calendar c1 = Calendar.getInstance(); // today
-		return sdf.format(c1.getTime());
-	}
-
-	/**
-	 * 计算从date开始n天以前（以后）的日期
-	 * 
-	 * @param date
-	 * @param dateCnt
-	 * @return
-	 */
-	public static Date getDateRelateToDate(Date date, int dateCnt) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(date);
-		calendar.add(Calendar.DATE, dateCnt);
-		return calendar.getTime();
+	public static String getCurDate(DATE_FORMAT dateFormat) {
+		return getDateFormatInstance(dateFormat).format(new Date());
 	}
 	
 	/**
@@ -372,13 +287,12 @@ public final class TimeUtils {
 	 * @param outputDateFormat
 	 * @return
 	 */
-	public static String getFirstDayOfWeek(String today, String inputDateFormat, String outputDateFormat) {
-		Date sourceDate = changeStrToDate(today, inputDateFormat);
+	public static String getFirstDateOfWeek(String today, DATE_FORMAT inputDateFormat, DATE_FORMAT outputDateFormat) {
+		Date sourceDate = strTimeToDate(today, inputDateFormat);
 		Calendar calendar = Calendar.getInstance();
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
         calendar.setTime(sourceDate);
-        calendar.set(Calendar.DAY_OF_WEEK,
-                      calendar.getFirstDayOfWeek());
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
         return dateFormat(calendar.getTime(), outputDateFormat);
 	}
 	
@@ -389,14 +303,13 @@ public final class TimeUtils {
 	 * @param outputDateFormat
 	 * @return
 	 */
-	public static String getLastDayOfWeek(String today, String inputDateFormat, String outputDateFormat) {
-		Date sourceDate = changeStrToDate(today, inputDateFormat);
-		Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+	public static String getLastDateOfWeek(String today, DATE_FORMAT inputDateFormat, DATE_FORMAT outputDateFormat) {
+        Date sourceDate = strTimeToDate(today, inputDateFormat);
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(sourceDate);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
         calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek() + 6);
-        calendar.add(Calendar.DATE, 1);
-        return dateFormat(new Date(calendar.getTime().getTime() - 1000), outputDateFormat);
+        return dateFormat(new Date(calendar.getTime().getTime()), outputDateFormat);
 	}
 	
 	/**
@@ -406,36 +319,13 @@ public final class TimeUtils {
 	 * @param format
 	 * @return
 	 */
-	public static Date changeStrToDate(String date, String format) {
-        SimpleDateFormat sf = getDateFormatInstance(format);
-		Date dt = null;
-		try {
-			dt = sf.parse(date);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		return dt;
-	}
-
-	/**
-	 * 检查字符串是否给定的日期格式
-	 * 
-	 * @param date
-	 * @param format
-	 * @return
-	 */
-	public static boolean checkDate(String date, String format) {
-		if (null == date || "".equals(date.trim())) {
-			return false;
-		}
-
-		try {
-            SimpleDateFormat dateFormat = getDateFormatInstance(format);
-			Date formatDate = dateFormat.parse(date);
-			return changeStrTimeFormat(date, format, format).equals(dateFormat.format(formatDate));
-		} catch (ParseException e) {
-			return false;
-		}
+	public static Date strTimeToDate(String date, DATE_FORMAT format) {
+        try {
+            return getDateFormatInstance(format).parse(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
 	}
 
 	/**
@@ -448,7 +338,7 @@ public final class TimeUtils {
 	 * @return 返回相差的秒数
 	 */
 	public static long getOffsetSeconds(Date date1, Date date2) {
-		long seconds = (long) ((date2.getTime() - date1.getTime()) / 1000);
+		long seconds = ((date2.getTime() - date1.getTime()) / 1000);
 		return seconds;
 	}
 
@@ -481,14 +371,14 @@ public final class TimeUtils {
 	/**
 	 * 获取时间startDate与endDate相差的天数数(endDate - startDate)
 	 * 
-	 * @param startDate
+	 * @param date1
 	 *            起始时间
-	 * @param endDate
+	 * @param date2
 	 *            结束时间
 	 * @return 返回相差的天数
 	 */
-	public static long getOffsetDays(Date startDate, Date endDate) {
-		return getOffsetHours(startDate, endDate) / 24;
+	public static long getOffsetDays(Date date1, Date date2) {
+		return getOffsetHours(date1, date2) / 24;
 	}
 
 	/**
@@ -507,19 +397,19 @@ public final class TimeUtils {
 	/**
 	 * 获取时间startDate与endDate相差的月数
 	 * 
-	 * @param startDate
+	 * @param date1
 	 *            起始时间
-	 * @param endDate
+	 * @param date2
 	 *            结束时间
 	 * @return 返回相差的天数
 	 */
-	public static int getOffsetMonths(Date startDate, Date endDate) {
+	public static int getOffsetMonths(Date date1, Date date2) {
 		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(startDate);
+		calendar.setTime(date1);
 		int curYear = calendar.get(Calendar.YEAR);
 		int curMonths =  calendar.get(Calendar.MONTH) + 1;
 		int curDays = calendar.get(Calendar.DAY_OF_MONTH);
-		calendar.setTime(endDate);
+		calendar.setTime(date2);
 		int endYear = calendar.get(Calendar.YEAR);
 		int endMonths =  calendar.get(Calendar.MONTH) + 1;
 		int endDays = calendar.get(Calendar.DAY_OF_MONTH);
@@ -533,12 +423,12 @@ public final class TimeUtils {
 	 * @param minute
 	 * @return
 	 */
-	public static Date rollMinute(Date date, int minute){
+	public static Date rollMinutes(Date date, int minute){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.add(Calendar.MINUTE, minute);
-		Date date1 = new Date(calendar.getTimeInMillis());
-		return date1;
+		Date result = new Date(calendar.getTimeInMillis());
+		return result;
 	}
 	
 	/**
@@ -547,12 +437,12 @@ public final class TimeUtils {
 	 * @param hour
 	 * @return
 	 */
-	public static Date rollHour(Date date, int hour){
+	public static Date rollHours(Date date, int hour){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.add(Calendar.HOUR_OF_DAY, hour);
-		Date date1 = new Date(calendar.getTimeInMillis());
-		return date1;
+		Date result = new Date(calendar.getTimeInMillis());
+		return result;
 	}
 	
 	/**
@@ -570,9 +460,7 @@ public final class TimeUtils {
 	 */
 	public static Date rollDate(Date date, int year, int month, int day) {
 		Calendar cal = Calendar.getInstance();
-		if (date != null) {
-			cal.setTime(date);
-		}
+        cal.setTime(date);
 		cal.add(Calendar.YEAR, year);
 		cal.add(Calendar.MONTH, month);
 		cal.add(Calendar.DAY_OF_MONTH, day);
@@ -588,7 +476,7 @@ public final class TimeUtils {
 	 *            指定月数
 	 * @return 返回累加月数后的时间
 	 */
-	public static Date rollMonth(Date date, int month) {
+	public static Date rollMonths(Date date, int month) {
 		return rollDate(date, 0, month, 0);
 	}
 
@@ -601,7 +489,7 @@ public final class TimeUtils {
 	 *            指定天数
 	 * @return 返回累加天数后的时间
 	 */
-	public static Date rollDay(Date date, int day) {
+	public static Date rollDays(Date date, int day) {
 		return rollDate(date, 0, 0, day);
 	}
 
@@ -612,15 +500,13 @@ public final class TimeUtils {
 	 *            指定日期
 	 * @return 返回所在月份的天数
 	 */
-	public static int getDayOfMonth(Date date) {
+	public static int getDaysOfMonth(Date date) {
 		Calendar cal = Calendar.getInstance();
-		if (date != null) {
-			cal.setTime(date);
-		}
+        cal.setTime(date);
 		int dayOfMonth = cal.getActualMaximum(Calendar.DATE);
 		return dayOfMonth;
 	}
-	
+
 	/**
 	 * 将时间置为一天中最早的一秒
 	 * @param today
@@ -628,7 +514,7 @@ public final class TimeUtils {
 	 * @param outputDateFormat
 	 * @return
 	 */
-	public static String getFirstSecondOfDay(String today, String inputDateFormat, String outputDateFormat){
+	public static String getFirstSecondOfDay(String today, DATE_FORMAT inputDateFormat, DATE_FORMAT outputDateFormat){
 		Date now = strTimeToDate(today, inputDateFormat);
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.setTime(now);
@@ -638,7 +524,7 @@ public final class TimeUtils {
 		calendar.set(Calendar.MILLISECOND, 0);
 		return dateFormat(calendar.getTime(), outputDateFormat);
 	}
-	
+
 	/**
 	 * 将时间置为一天最晚的一秒
 	 * @param today
@@ -646,7 +532,7 @@ public final class TimeUtils {
 	 * @param outputDateFormat
 	 * @return
 	 */
-	public static String getLastSecondOfDay(String today, String inputDateFormat, String outputDateFormat){
+	public static String getLastSecondOfDay(String today, DATE_FORMAT inputDateFormat, DATE_FORMAT outputDateFormat){
 		Date now = strTimeToDate(today, inputDateFormat);
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.setTime(now);
@@ -663,7 +549,7 @@ public final class TimeUtils {
 	 * @param inputDateFormat
 	 * @return
 	 */
-	public static int getWeekday(String date, String inputDateFormat) {
+	public static int getWeekday(String date, DATE_FORMAT inputDateFormat) {
 		Calendar c = Calendar.getInstance();
 		c.setTime((strTimeToDate(date, inputDateFormat)));
 		int weekday = c.get(Calendar.DAY_OF_WEEK) - 1;
@@ -672,19 +558,16 @@ public final class TimeUtils {
 		}
 		return weekday;
 	}
-	
-	/**
-	 * 计算两个日期之间相差的月份列表
-	 * @param beginDate
-	 * @param endDate
-	 * @return
-	 */
-	public static List<String> getMonthList(Date beginDate, Date endDate, String format){
-		List<String> monthList = new ArrayList<String>();
-		return monthList;
-	}
 
 	/*===================补充 JDK1.8 特性===========================*/
+
+    private static final EnumMap<DATE_FORMAT, DateTimeFormatter> DATE_FORMAT_MAPPING = new EnumMap<>(DATE_FORMAT.class);
+    static {
+        for (DATE_FORMAT _dateFormat : DATE_FORMAT.values()) {
+            DATE_FORMAT_MAPPING.put(_dateFormat, DateTimeFormatter.ofPattern(_dateFormat.getFormat()));
+        }
+    }
+
     /**
      * 时间戳转化为时间<br/>
      * Created on : 2016-09-07 20:16
@@ -694,8 +577,7 @@ public final class TimeUtils {
      * @return
      */
     public static LocalDateTime timeMillisToDate(long timeMillis) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis), zoneId);
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis), ZoneId.systemDefault());
     }
 
     /**
@@ -715,7 +597,7 @@ public final class TimeUtils {
      * @param endDatetime   结束时间
      * @return 返回相差的月数
      */
-    public static long getOffsetBetweenDate(ChronoUnit units, LocalDateTime startDatetime, LocalDateTime endDatetime) {
+    public static long getOffset(ChronoUnit units, LocalDateTime startDatetime, LocalDateTime endDatetime) {
         return units.between(startDatetime, endDatetime);
     }
 
@@ -728,12 +610,6 @@ public final class TimeUtils {
      * @return
      */
     public static long dateToTimeMillis(Date value) {
-        if(value == null) {
-            return 0;
-        }
-        if(value.getClass() == java.util.Date.class || value.getClass() == Timestamp.class) {
-            return ((Date)value).getTime();
-        }
         return value.getTime();
     }
 
@@ -746,10 +622,7 @@ public final class TimeUtils {
      * @return
      */
     public static long dateToTimeMillis(LocalDate value) {
-        if(value == null) {
-            return 0;
-        }
-        return ((LocalDate) value).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return value.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     /**
@@ -761,10 +634,7 @@ public final class TimeUtils {
      * @return
      */
     public static long dateToTimeMillis(LocalTime value) {
-        if(value == null) {
-            return 0;
-        }
-        return ((LocalTime)value).atDate(LocalDate.of(1970, 01, 01)).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return value.atDate(MIN_LOCAL_DATE_TIME.toLocalDate()).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     /**
@@ -776,10 +646,7 @@ public final class TimeUtils {
      * @return
      */
     public static long dateToTimeMillis(LocalDateTime value) {
-        if(value == null) {
-            return 0;
-        }
-        return ((LocalDateTime) value).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     /**
@@ -789,7 +656,7 @@ public final class TimeUtils {
      * @param dateFormat
      * @return
      */
-    public static String dateFormat(long timeMillis, String dateFormat) {
+    public static String dateFormat(long timeMillis, DATE_FORMAT dateFormat) {
         return DATE_FORMAT_MAPPING.get(dateFormat).format(timeMillisToDate(timeMillis));
     }
 
@@ -802,7 +669,33 @@ public final class TimeUtils {
      * @param dateFormat
      * @return
      */
-    public static String dateFormat(Temporal temporal, String dateFormat) {
+    public static String dateFormat(LocalDate temporal, DATE_FORMAT dateFormat) {
+        return DATE_FORMAT_MAPPING.get(dateFormat).format(temporal.atStartOfDay());
+    }
+
+    /**
+     * 日期格式化<br/>
+     * Created on : 2016-09-19 18:18
+     * @author lizebin
+     * @version V1.0.0
+     * @param temporal
+     * @param dateFormat
+     * @return
+     */
+    public static String dateFormat(LocalTime temporal, DATE_FORMAT dateFormat) {
+        return DATE_FORMAT_MAPPING.get(dateFormat).format(temporal.atDate(MIN_LOCAL_DATE_TIME.toLocalDate()));
+    }
+
+    /**
+     * 日期格式化<br/>
+     * Created on : 2016-09-19 18:18
+     * @author lizebin
+     * @version V1.0.0
+     * @param temporal
+     * @param dateFormat
+     * @return
+     */
+    public static String dateFormat(LocalDateTime temporal, DATE_FORMAT dateFormat) {
         return DATE_FORMAT_MAPPING.get(dateFormat).format(temporal);
     }
 
