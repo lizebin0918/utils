@@ -33,7 +33,7 @@ public class FrequencyHelper {
     /**
      * 上次调用时间戳
      */
-    private LocalDateTime lastCallDatetime = LocalDateTime.now();
+    private volatile LocalDateTime lastCallDatetime = LocalDateTime.now();
 
     /**
      * 计数器
