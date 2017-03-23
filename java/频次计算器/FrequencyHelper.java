@@ -36,6 +36,11 @@ public class FrequencyHelper {
     private volatile LocalDateTime lastCallDatetime = LocalDateTime.now();
 
     /**
+     *  重置状态
+     */
+    private AtomicReference<Boolean> reset = new AtomicReference<>(false);
+
+    /**
      * 计数器
      */
     private ConcurrentHashMap<String, AtomicLong> counter = new ConcurrentHashMap<>();
@@ -67,10 +72,11 @@ public class FrequencyHelper {
         });
         //上次调用时间 - 当前时间 >= 时间间隔:需要重设计数器
         if(interval <= timeUnit.between(lastCallDatetime, LocalDateTime.now())) {
-            synchronized (this) {
+            if(!reset.get() && !reset.getAndSet(true)) {
                 if(interval <= timeUnit.between(lastCallDatetime, LocalDateTime.now())) {
-                    lastCallDatetime = LocalDateTime.now();
                     count.set(0L);
+                    lastCallDatetime = LocalDateTime.now();
+                    reset.set(false);
                 }
             }
         }
