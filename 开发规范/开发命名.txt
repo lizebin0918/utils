@@ -1,5 +1,0 @@
-1. 我们平时常用的驼峰标识命名：
-     1.1. private String strMsg;private long lngLength; 
-	  这种成员变量命名规则：类型缩写+字段。
-	  boolean : bln;long : lng;double : dbl;String : str;int : int;float : flt;
-     1.2. 对于循环变量（包括循环内的变量），一律采用"_"开头，表示临时变量。
