@@ -2,6 +2,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.regex.Pattern;
 
+
 public final class CheckUtils {
 
     private CheckUtils() {
@@ -12,7 +13,7 @@ public final class CheckUtils {
      *
      * @param value
      * @param valueType
-     * @return
+     * @return true 表示验证通过
      */
     public static boolean checkValueType(String value, String valueType) {
         if (CheckTypeConst.CHECK_VALUE_TYPE_XSTRING.equals(valueType)) {
@@ -21,7 +22,7 @@ public final class CheckUtils {
         } else if (CheckTypeConst.CHECK_VALUE_TYPE_NSTRING
                 .equals(valueType)) {
             // Number [0-9]
-            return isXString(value) && isNString(value);
+            return isNString(value);
         } else if (CheckTypeConst.CHECK_VALUE_TYPE_ASTRING
                 .equals(valueType)) {
             // 由字母[a-z]或[A-Z]组成的字符串
@@ -53,6 +54,9 @@ public final class CheckUtils {
         } else if (CheckTypeConst.CHECK_VALUE_TYPE_DATE_TIME.equals(valueType)) {
             //yyyy-MM-dd HH:mm:ss
             return isDatetime(value);
+        } else if (CheckTypeConst.CHECK_VALUE_TYPE_MONEY.equals(valueType)) {
+            //最多只能包含两个小数点
+            return isMoneyIncludeZero(value);
         }
         return false;// 找不到预定义类型，配置出错，验证失败
     }
@@ -64,6 +68,9 @@ public final class CheckUtils {
      * @return
      */
     private static boolean isXString(String value) {
+        if (value == null || value.trim().length() == 0) {
+            return false;
+        }
         for (int i = 0, length = value.length(); i < length; i++) {
             if (!isXString(value.charAt(i))) {
                 return false;
@@ -79,6 +86,9 @@ public final class CheckUtils {
      * @return
      */
     private static boolean isNSString(String value) {
+        if (value == null || value.trim().length() == 0) {
+            return false;
+        }
         for (int i = 0, length = value.length(); i < length; i++) {
             if (!isNSString(value.charAt(i))) {
                 return false;
@@ -94,6 +104,9 @@ public final class CheckUtils {
      * @return
      */
     private static boolean isANSString(String value) {
+        if (value == null || value.trim().length() == 0) {
+            return false;
+        }
         for (int i = 0, length = value.length(); i < length; i++) {
             if (!isXString(value.charAt(i))) {
                 if (!Character.isLetter(value.charAt(i))) {
@@ -111,6 +124,9 @@ public final class CheckUtils {
      * @return
      */
     private static boolean isNString(String value) {
+        if (value == null || value.trim().length() == 0) {
+            return false;
+        }
         for (int i = 0, length = value.length(); i < length; i++) {
             if (!Character.isDigit(value.charAt(i))) {
                 return false;
@@ -126,6 +142,9 @@ public final class CheckUtils {
      * @return
      */
     private static boolean isAString(String value) {
+        if (value == null || value.trim().length() == 0) {
+            return false;
+        }
         for (int i = 0, length = value.length(); i < length; i++) {
             if (!Character.isLetter(value.charAt(i))) {
                 return false;
@@ -141,6 +160,9 @@ public final class CheckUtils {
      * @return
      */
     private static boolean isANString(String value) {
+        if (value == null || value.trim().length() == 0) {
+            return false;
+        }
         for (int i = 0, length = value.length(); i < length; i++) {
             if (!Character.isLetterOrDigit(value.charAt(i))) {
                 return false;
@@ -156,6 +178,9 @@ public final class CheckUtils {
      * @return
      */
     private static boolean isGBString(String value) {
+        if (value == null || value.trim().length() == 0) {
+            return false;
+        }
         CharsetEncoder gbkEncoder = Charset.forName("GBK").newEncoder();
         for (int i = 0, length = value.length(); i < length; i++) {
             if ((!isXString(value.charAt(i)) && !gbkEncoder.canEncode(value.charAt(i))) || isXStringAndSpecialChar(value.charAt(i))) {
@@ -173,6 +198,9 @@ public final class CheckUtils {
      * @return
      */
     private static boolean isHexBinary(String value) {
+        if (value == null || value.trim().length() == 0) {
+            return false;
+        }
         return value.matches("[0-9a-fA-F]+");
     }
 
@@ -213,13 +241,30 @@ public final class CheckUtils {
     }
 
     /**
+     * HH:mm:ss
+     */
+    private static final Pattern TIME_PATTERN = Pattern.compile("^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$");
+    /**
+     * yyyy-MM-dd
+     */
+    private static final Pattern DATE_PATTERN = Pattern.compile("^((((1[6-9]|[2-9]\\d)\\d{2})-(1[02]|0[13578])-([12]\\d|3[01]|0[1-9]))|(((1[6-9]|[2-9]\\d)\\d{2})-(1[012]|0[13456789])-([12]\\d|30|0[1-9]))|(((1[6-9]|[2-9]\\d)\\d{2})-02-(1\\d|2[0-8]|0[1-9]))|(((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))-02-29))$");
+    /**
+     * yyyy-MM-dd HH:mm:ss
+     */
+    private static final Pattern DATETIME_PATTERN = Pattern.compile("^((((1[6-9]|[2-9]\\d)\\d{2})-(1[02]|0[13578])-([12]\\d|3[01]|0[1-9]))|(((1[6-9]|[2-9]\\d)\\d{2})-(1[012]|0[13456789])-([12]\\d|30|0[1-9]))|(((1[6-9]|[2-9]\\d)\\d{2})-02-(1\\d|2[0-8]|0[1-9]))|(((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))-02-29)) ([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$");
+    /**
+     * 金额校验，最多只能包含两位小数
+     */
+    private static final Pattern MONEY_PATTERN = Pattern.compile("^(([0-9]\\d*)(\\.\\d{1,2})?)$|^(0\\.0([1-9]?))$|^(0\\.([1-9]\\d?))$");
+
+    /**
      * 时间格式:HH:mm:ss,注意:23:9:9属于不合法
      *
      * @param value
      * @return
      */
     private static boolean isTime(String value) {
-        return Pattern.compile("^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$").matcher(value).find();
+        return TIME_PATTERN.matcher(value).find();
     }
 
     /**
@@ -229,7 +274,7 @@ public final class CheckUtils {
      * @return
      */
     private static boolean isDate(String value) {
-        return Pattern.compile("^((((1[6-9]|[2-9]\\d)\\d{2})-(1[02]|0[13578])-([12]\\d|3[01]|0[1-9]))|(((1[6-9]|[2-9]\\d)\\d{2})-(1[012]|0[13456789])-([12]\\d|30|0[1-9]))|(((1[6-9]|[2-9]\\d)\\d{2})-02-(1\\d|2[0-8]|0[1-9]))|(((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))-02-29))$").matcher(value).find();
+        return DATE_PATTERN.matcher(value).find();
     }
 
     /**
@@ -239,7 +284,16 @@ public final class CheckUtils {
      * @return
      */
     private static boolean isDatetime(String value) {
-        return Pattern.compile("^((((1[6-9]|[2-9]\\d)\\d{2})-(1[02]|0[13578])-([12]\\d|3[01]|0[1-9]))|(((1[6-9]|[2-9]\\d)\\d{2})-(1[012]|0[13456789])-([12]\\d|30|0[1-9]))|(((1[6-9]|[2-9]\\d)\\d{2})-02-(1\\d|2[0-8]|0[1-9]))|(((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))-02-29)) ([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$").matcher(value).find();
+        return DATETIME_PATTERN.matcher(value).find();
+    }
+
+    /**
+     * 金额校验，最多只能包含两位小数
+     * @param value
+     * @return
+     */
+    private static boolean isMoneyIncludeZero(String value) {
+        return MONEY_PATTERN.matcher(value).find();
     }
 
     /**
