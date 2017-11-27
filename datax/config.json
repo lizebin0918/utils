@@ -1,0 +1,45 @@
+{
+    "job": {
+        "content": [
+            {
+                "reader": {
+                    "name": "mysqlreader",
+                    "parameter": {
+                        "where":" customer_id = $customerId and buy_date <= 1510963200 ",
+                        "sliceRecordCount": 10000,
+                        "connection": [
+                            {
+                                "jdbcUrl": ["jdbc:mysql://gz-cdb-qla6hjna.sql.tencentcdb.com:63637/focus_health"],
+                                "table":["sale"]
+                            }
+                        ],
+                        "column": ["id","customer_id","card_no","buy_date","order_no","pay_money","store_no","store_user_no","ctime"],
+                        "password": "sinoxk_2016@0801",
+                        "username": "root"
+                    }
+                },
+                "writer": {
+                    "name": "mysqlwriter",
+                    "parameter": {
+                    "writeMode": "insert",
+                    "username": "root",
+                    "password": "9jxWI9uOq1KU7W0B",
+                    "column": ["id","customer_id","card_no","buy_date","order_no","pay_money","store_no","store_user_no","ctime"],    
+                    "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://gz-cdb-7axalfrn.sql.tencentcdb.com:63636/focus_health",
+                                "table": ["sale"]
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "_comment":"Job支持用户对速度的自定义控制，channel的值可以控制同步时的并发数，byte的值可以控制同步时的速度",
+        "setting": {
+            "speed": {
+                "channel": "4"
+            }
+        }
+    }
+}   
