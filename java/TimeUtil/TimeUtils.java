@@ -1,18 +1,16 @@
-package com.yaodian.utils.time;
-
-import java.sql.Timestamp;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 /**
- * 要求 JDK版本 >= 1.8
+ * Required jdk1.8+
+ *
  * @author lizebin
- * 
+ *
+ * Notice:形参不再判断是否为空，也不判断格式是否正确，所有异常由外部处理
  */
 public final class TimeUtils {
 
@@ -25,10 +23,12 @@ public final class TimeUtils {
          * 格式为:yyyyMMddHHmmssSSS
          */
         yyyyMMddHHmmssSSS("yyyyMMddHHmmssSSS"),
+
         /**
          * 格式为:yyyy-MM-dd HH:mm:ss.SSS
          */
         yyyy_MM_dd_HH_mm_ss_SSS("yyyy-MM-dd HH:mm:ss.SSS"),
+        
         /**
          * 格式为:yyyyMMddHHmmss
          */
@@ -104,9 +104,11 @@ public final class TimeUtils {
         dd("dd"),
         HH("HH"),
         mm("mm"),
-        ss("ss");
+        ss("ss"),
+        yyMMdd("yyMMdd"),
+        yyMMddHHmmss("yyMMddHHmmss");
 
-        private String format;
+        private final String format;
         DATE_FORMAT(String format) {
             this.format = format;
         }
@@ -146,111 +148,99 @@ public final class TimeUtils {
      * UTC：格林威治时间1970年01月01日00时00分00秒（UTC+8北京时间1970年01月01日08时00分00秒）
      */
     private static final LocalDateTime MIN_LOCAL_DATE_TIME = LocalDateTime.of(1970, 1, 1, 0, 0, 0, 0);
-	
-	/**
-	 * 返回当月月份前n个月份的年月
-	 * 
-	 * @param today
-	 * @param n
-	 * @return
-	 */
-	public static String getPreMonthReturnYearMonth(String today, DATE_FORMAT format, int n) {
-		String result = null;
-        String tmp = changeStrTimeFormat(today, format, DATE_FORMAT.yyyyMMdd);
-        int year = Integer.parseInt(tmp.substring(0, 4));
-        int month = Integer.parseInt(tmp.substring(4, 6));
-        Calendar calendar = Calendar.getInstance();
-        month = month - n - 1;
-        if (month < 0) {
-            year = year - 1;
-            month = month + 12;
-        }
-        calendar.set(year, month, 1, 0, 0, 0);
-        SimpleDateFormat sdf = getDateFormatInstance(DATE_FORMAT.yyyyMM);
-        result = sdf.format(new Date(calendar.getTime().getTime()));
-		return result;
-	}
+
+    /*默认的 zoneId*/
+    private static final ZoneId ZONE_ID = ZoneId.systemDefault();
 
 	/**
 	 * 返回当月最后一天日期
 	 * 
 	 * @param today
+	 * @param inputFormat
+	 * @param outputFormat
 	 * @return
 	 */
 	public static String getLastDateOfMonth(String today, DATE_FORMAT inputFormat, DATE_FORMAT outputFormat) {
-		String result = null;
-		try {
-			String tmp = changeStrTimeFormat(today, inputFormat,
-                                             DATE_FORMAT.yyyyMMdd);
-			int year = Integer.parseInt(tmp.substring(0, 4));
-			int month = Integer.parseInt(tmp.substring(4, 6));
-			if (month == 12) {
-				year = year + 1;
-				month = 0;
-			}
-			Calendar calendar = Calendar.getInstance();
-			calendar.set(year, month, 1, 0, 0, 0);
-            SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
-			result = sdf.format(new Date(calendar.getTime().getTime() - 1000));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
+        return dateFormat(dateToLocalDateTime(strTimeToDate(today, inputFormat)).with(TemporalAdjusters.lastDayOfMonth()), outputFormat);
 	}
+
+    /**
+     * 返回当月最后一天日期
+     *
+     * @param now
+     * @return
+     */
+    public static Date getLastDateOfMonth(Date now) {
+        return temporalToDate(dateToLocalDateTime(now).with(TemporalAdjusters.lastDayOfMonth()));
+    }
 
 	/**
 	 * 返回上一个月最后一天日期
 	 * 
 	 * @param today
+	 * @param inputFormat
+	 * @param outputFormat
 	 * @return
 	 */
 	public static String getPreMonthLastDate(String today, DATE_FORMAT inputFormat, DATE_FORMAT outputFormat) {
-        String tmp = changeStrTimeFormat(today, inputFormat, DATE_FORMAT.yyyyMMdd);
-        int year = Integer.parseInt(tmp.substring(0, 4));
-        int month = Integer.parseInt(tmp.substring(4, 6));
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month - 1, 0);
-        SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
-        return sdf.format(new Date(calendar.getTime().getTime()));
+        return dateFormat(dateToLocalDateTime(strTimeToDate(today, inputFormat)).minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()), outputFormat);
 	}
+
+    /**
+     * 返回上一个月最后一天日期
+     *
+     * @param now
+     * @return
+     */
+    public static Date getPreMonthLastDate(Date now) {
+        return temporalToDate(dateToLocalDateTime(now).minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()));
+    }
 
 	/**
 	 * 返回下一个月第一天日期
 	 * 
 	 * @param today
+	 * @param inputFormat
+	 * @param outputFormat
 	 * @return
 	 */
 	public static String getNextMonthFirstDate(String today, DATE_FORMAT inputFormat, DATE_FORMAT outputFormat) {
-        String tmp = changeStrTimeFormat(today, inputFormat, DATE_FORMAT.yyyyMMdd);
-        int year = Integer.parseInt(tmp.substring(0, 4));
-        int month = Integer.parseInt(tmp.substring(4, 6));
-        if (month == 12) {
-            year = year + 1;
-            month = 0;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, 1);
-        return getDateFormatInstance(outputFormat).format(calendar.getTime());
+        return dateFormat(dateToLocalDateTime(strTimeToDate(today, inputFormat)).plusMonths(1).with(TemporalAdjusters.firstDayOfMonth()), outputFormat);
 	}
+
+    /**
+     * 返回下一个月第一天日期
+     *
+     * @param now
+     * @return
+     */
+    public static Date getNextMonthFirstDate(Date now) {
+        return temporalToDate(dateToLocalDateTime(now).plusMonths(1).with(TemporalAdjusters.firstDayOfMonth()));
+    }
 
 	/**
 	 * 返回本一个月第一天日期
 	 * 
 	 * @param today
+	 * @param inputFormat
+	 * @param outputFormat
 	 * @return
 	 */
-	public static String getFirstDateOfMonth(String today,
-                                             DATE_FORMAT inputFormat, DATE_FORMAT outputFormat) {
-        String tmp = DATE_FORMAT.yyyyMMdd.equals(inputFormat) ? today : changeStrTimeFormat(today, inputFormat, DATE_FORMAT.yyyyMMdd);
-        int year = Integer.parseInt(tmp.substring(0, 4));
-        int month = Integer.parseInt(tmp.substring(4, 6));
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month - 1, 1, 0, 0, 0);
-        SimpleDateFormat sdf = getDateFormatInstance(outputFormat);
-        return sdf.format(calendar.getTime());
+	public static String getFirstDateOfMonth(String today, DATE_FORMAT inputFormat, DATE_FORMAT outputFormat) {
+        return dateFormat(dateToLocalDateTime(strTimeToDate(today, inputFormat)).with(TemporalAdjusters.firstDayOfMonth()), outputFormat);
 	}
 
-	/**
+    /**
+     * 返回本一个月第一天日期
+     *
+     * @param today
+     * @return
+     */
+    public static Date getFirstDateOfMonth(Date now) {
+        return temporalToDate(dateToLocalDateTime(now).with(TemporalAdjusters.firstDayOfMonth()));
+    }
+
+    /**
 	 * 格式日期转换
 	 * 
 	 * @param date
@@ -283,35 +273,44 @@ public final class TimeUtils {
 	/**
 	 * 获取当周第一天，周一作为一个星期的第一天
 	 * @param today
-	 * @param inputDateFormat
-	 * @param outputDateFormat
+	 * @param inputFormat
+	 * @param outputFormat
 	 * @return
 	 */
-	public static String getFirstDateOfWeek(String today, DATE_FORMAT inputDateFormat, DATE_FORMAT outputDateFormat) {
-		Date sourceDate = strTimeToDate(today, inputDateFormat);
-		Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        calendar.setTime(sourceDate);
-        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
-        return dateFormat(calendar.getTime(), outputDateFormat);
+	public static String getFirstDateOfWeek(String today, DATE_FORMAT inputFormat, DATE_FORMAT outputFormat) {
+        return dateFormat(dateToLocalDateTime(strTimeToDate(today, inputFormat)).with(DayOfWeek.MONDAY), outputFormat);
 	}
-	
+
+    /**
+     * 获取当周第一天，周一作为一个星期的第一天
+     * @param now
+     * @return
+     */
+    public static Date getFirstDateOfWeek(Date now) {
+        return temporalToDate(dateToLocalDateTime(now).with(DayOfWeek.MONDAY));
+    }
+
 	/**
 	 * 获取当周最后一天，周日为一个星期的最后一天
 	 * @param today
-	 * @param inputDateFormat
-	 * @param outputDateFormat
+	 * @param inputFormat
+	 * @param outputFormat
 	 * @return
 	 */
-	public static String getLastDateOfWeek(String today, DATE_FORMAT inputDateFormat, DATE_FORMAT outputDateFormat) {
-        Date sourceDate = strTimeToDate(today, inputDateFormat);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(sourceDate);
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek() + 6);
-        return dateFormat(new Date(calendar.getTime().getTime()), outputDateFormat);
+	public static String getLastDateOfWeek(String today, DATE_FORMAT inputFormat, DATE_FORMAT outputFormat) {
+        return dateFormat(dateToLocalDateTime(strTimeToDate(today, inputFormat)).with(DayOfWeek.SUNDAY), outputFormat);
 	}
-	
+
+    /**
+     * 获取当周最后一天，周日为一个星期的最后一天
+     * @param now
+     * @return
+     */
+    public static Date getLastDateOfWeek(Date now) {
+        return temporalToDate(dateToLocalDateTime(now).with(DayOfWeek.SUNDAY));
+    }
+
+
 	/**
 	 * 将字符串转换为日期类型
 	 * 
@@ -330,7 +329,7 @@ public final class TimeUtils {
 
 	/**
 	 * 获取时间date1与date2相差的秒数
-	 * 
+	 *
 	 * @param date1
 	 *            起始时间
 	 * @param date2
@@ -338,13 +337,12 @@ public final class TimeUtils {
 	 * @return 返回相差的秒数
 	 */
 	public static long getOffsetSeconds(Date date1, Date date2) {
-		long seconds = ((date2.getTime() - date1.getTime()) / 1000);
-		return seconds;
+		return ((date2.getTime() - date1.getTime()) / 1000);
 	}
 
 	/**
 	 * 获取时间date1与date2相差的分钟数
-	 * 
+	 *
 	 * @param date1
 	 *            起始时间
 	 * @param date2
@@ -357,7 +355,7 @@ public final class TimeUtils {
 
 	/**
 	 * 获取时间date1与date2相差的小时数
-	 * 
+	 *
 	 * @param date1
 	 *            起始时间
 	 * @param date2
@@ -370,7 +368,7 @@ public final class TimeUtils {
 
 	/**
 	 * 获取时间startDate与endDate相差的天数数(endDate - startDate)
-	 * 
+	 *
 	 * @param date1
 	 *            起始时间
 	 * @param date2
@@ -383,7 +381,7 @@ public final class TimeUtils {
 
 	/**
 	 * 获取时间date1与date2相差的周数
-	 * 
+	 *
 	 * @param date1
 	 *            起始时间
 	 * @param date2
@@ -393,13 +391,13 @@ public final class TimeUtils {
 	public static long getOffsetWeeks(Date date1, Date date2) {
 		return getOffsetDays(date1, date2) / 7;
 	}
-	
+
 	/**
 	 * 获取时间startDate与endDate相差的月数
-	 * 
+	 *
 	 * @param date1
 	 *            起始时间
-	 * @param date2
+	 * @param DATE2
 	 *            结束时间
 	 * @return 返回相差的天数
 	 */
@@ -413,8 +411,7 @@ public final class TimeUtils {
 		int endYear = calendar.get(Calendar.YEAR);
 		int endMonths =  calendar.get(Calendar.MONTH) + 1;
 		int endDays = calendar.get(Calendar.DAY_OF_MONTH);
-		int uy = (endYear - curYear) * 12 + (endMonths - curMonths) + (endDays < curDays ? -1 : 0); 
-		return uy;
+		return (endYear - curYear) * 12 + (endMonths - curMonths) + (endDays < curDays ? -1 : 0);
 	}
 	
 	/**
@@ -427,8 +424,7 @@ public final class TimeUtils {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.add(Calendar.MINUTE, minute);
-		Date result = new Date(calendar.getTimeInMillis());
-		return result;
+		return new Date(calendar.getTimeInMillis());
 	}
 	
 	/**
@@ -441,8 +437,7 @@ public final class TimeUtils {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.add(Calendar.HOUR_OF_DAY, hour);
-		Date result = new Date(calendar.getTimeInMillis());
-		return result;
+		return new Date(calendar.getTimeInMillis());
 	}
 	
 	/**
@@ -503,55 +498,54 @@ public final class TimeUtils {
 	public static int getDaysOfMonth(Date date) {
 		Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-		int dayOfMonth = cal.getActualMaximum(Calendar.DATE);
-		return dayOfMonth;
+		return cal.getActualMaximum(Calendar.DATE);
 	}
 
 	/**
 	 * 将时间置为一天中最早的一秒
 	 * @param today
-	 * @param inputDateFormat
-	 * @param outputDateFormat
+	 * @param inputFormat
+	 * @param outputFormat
 	 * @return
 	 */
-	public static String getFirstSecondOfDay(String today, DATE_FORMAT inputDateFormat, DATE_FORMAT outputDateFormat){
-		Date now = strTimeToDate(today, inputDateFormat);
+	public static String getFirstSecondOfDay(String today, DATE_FORMAT inputFormat, DATE_FORMAT outputFormat){
+		Date now = strTimeToDate(today, inputFormat);
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.setTime(now);
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
-		return dateFormat(calendar.getTime(), outputDateFormat);
+		return dateFormat(calendar.getTime(), outputFormat);
 	}
 
 	/**
 	 * 将时间置为一天最晚的一秒
 	 * @param today
-	 * @param inputDateFormat
-	 * @param outputDateFormat
+	 * @param inputFormat
+	 * @param outputFormat
 	 * @return
 	 */
-	public static String getLastSecondOfDay(String today, DATE_FORMAT inputDateFormat, DATE_FORMAT outputDateFormat){
-		Date now = strTimeToDate(today, inputDateFormat);
+	public static String getLastSecondOfDay(String today, DATE_FORMAT inputFormat, DATE_FORMAT outputFormat){
+		Date now = strTimeToDate(today, inputFormat);
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.setTime(now);
 		calendar.set(Calendar.HOUR_OF_DAY, 23);
 		calendar.set(Calendar.MINUTE, 59);
 		calendar.set(Calendar.SECOND, 59);
 		calendar.set(Calendar.MILLISECOND, 999);
-		return dateFormat(calendar.getTime(), outputDateFormat);
+		return dateFormat(calendar.getTime(), outputFormat);
 	}
 	
 	/**
 	 * 根据日期返回周几，周日为7
 	 * @param date
-	 * @param inputDateFormat
+	 * @param inputFormat
 	 * @return
 	 */
-	public static int getWeekday(String date, DATE_FORMAT inputDateFormat) {
+	public static int getWeekday(String date, DATE_FORMAT inputFormat) {
 		Calendar c = Calendar.getInstance();
-		c.setTime((strTimeToDate(date, inputDateFormat)));
+		c.setTime((strTimeToDate(date, inputFormat)));
 		int weekday = c.get(Calendar.DAY_OF_WEEK) - 1;
 		if(weekday <= 0) {
 			return 7;
@@ -559,9 +553,8 @@ public final class TimeUtils {
 		return weekday;
 	}
 
-	/*===================补充 JDK1.8 特性===========================*/
-
     private static final EnumMap<DATE_FORMAT, DateTimeFormatter> DATE_FORMAT_MAPPING = new EnumMap<>(DATE_FORMAT.class);
+
     static {
         for (DATE_FORMAT _dateFormat : DATE_FORMAT.values()) {
             DATE_FORMAT_MAPPING.put(_dateFormat, DateTimeFormatter.ofPattern(_dateFormat.getFormat()));
@@ -576,8 +569,20 @@ public final class TimeUtils {
      * @param timeMillis
      * @return
      */
-    public static LocalDateTime timeMillisToDate(long timeMillis) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis), ZoneId.systemDefault());
+    public static LocalDateTime timeMillisToLocalDateTime(long timeMillis) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis), ZONE_ID);
+    }
+
+	/**
+	 * 时间戳转化为时间<br/>
+	 * Created on : 2017-12-11 20:16
+	 * @author lizebin
+	 * @version V1.0.0
+	 * @param timeMillis
+	 * @return
+	 */
+    public static Date timeMillisToDate(long timeMillis) {
+    	return new Date(timeMillis);
     }
 
     /**
@@ -622,7 +627,7 @@ public final class TimeUtils {
      * @return
      */
     public static long dateToTimeMillis(LocalDate value) {
-        return value.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return value.atStartOfDay().atZone(ZONE_ID).toInstant().toEpochMilli();
     }
 
     /**
@@ -634,7 +639,7 @@ public final class TimeUtils {
      * @return
      */
     public static long dateToTimeMillis(LocalTime value) {
-        return value.atDate(MIN_LOCAL_DATE_TIME.toLocalDate()).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return value.atDate(MIN_LOCAL_DATE_TIME.toLocalDate()).atZone(ZONE_ID).toInstant().toEpochMilli();
     }
 
     /**
@@ -646,18 +651,18 @@ public final class TimeUtils {
      * @return
      */
     public static long dateToTimeMillis(LocalDateTime value) {
-        return value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return value.atZone(ZONE_ID).toInstant().toEpochMilli();
     }
 
     /**
      * 格式日期转换
      *
-     * @param timeMillis 时间戳
+     * @param timeMillis 时间戳(毫秒)
      * @param dateFormat
      * @return
      */
     public static String dateFormat(long timeMillis, DATE_FORMAT dateFormat) {
-        return DATE_FORMAT_MAPPING.get(dateFormat).format(timeMillisToDate(timeMillis));
+        return DATE_FORMAT_MAPPING.get(dateFormat).format(timeMillisToLocalDateTime(timeMillis));
     }
 
     /**
@@ -707,7 +712,7 @@ public final class TimeUtils {
      * @return
      */
     public static long getTimeMillis() {
-        return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return LocalDateTime.now().atZone(ZONE_ID).toInstant().toEpochMilli();
     }
 
     /**
@@ -718,7 +723,7 @@ public final class TimeUtils {
      * @return
      */
     public static long getTimeSecond() {
-        return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
+        return LocalDateTime.now().atZone(ZONE_ID).toInstant().getEpochSecond();
     }
 
     /**
@@ -727,6 +732,35 @@ public final class TimeUtils {
      * @return
      */
     public static LocalDateTime dateToLocalDateTime(Date date) {
-        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        return LocalDateTime.ofInstant(date.toInstant(), ZONE_ID);
     }
+
+    /**
+     * LocalDate 转 Date
+     * @param localDate
+     * @return
+     */
+    public static Date temporalToDate(LocalDate localDate) {
+        return Date.from(localDate.atStartOfDay().atZone(ZONE_ID).toInstant());
+    }
+
+    /**
+     * LocalTime 转 Date;年-月-日为:1970-01-01
+     * @param localTime
+     * @return
+     */
+    public static Date temporalToDate(LocalTime localTime) {
+        return Date.from(localTime.atDate(MIN_LOCAL_DATE_TIME.toLocalDate()).atZone(ZONE_ID).toInstant());
+    }
+
+    /**
+     *LocalDatetime 转 Date
+     * @param localDatetime
+     * @return
+     */
+    public static Date temporalToDate(LocalDateTime localDatetime) {
+        return Date.from(localDatetime.atZone(ZONE_ID).toInstant());
+    }
+
+
 }
