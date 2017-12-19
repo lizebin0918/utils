@@ -1,3 +1,23 @@
+
+import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.ss.usermodel.BuiltinFormats;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.xssf.eventusermodel.XSSFReader;
+import org.apache.poi.xssf.model.SharedStringsTable;
+import org.apache.poi.xssf.model.StylesTable;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+
 /**
  * SAX 读取大文件内容
  *
@@ -29,7 +49,7 @@ public class ExcelSaxReader extends DefaultHandler {
 	/**
 	 * 列值集合
 	 */
-	private LinkedHashMap<String, String> columnValueMap = new LinkedHashMap<>();
+	private Map<String, String> columnValueMap = new HashMap<>();
 
 	/**
 	 * 结果集
@@ -266,7 +286,7 @@ public class ExcelSaxReader extends DefaultHandler {
 				}
 				if (!isBlank) {
 					padWhitespace();
-					resultList.add(new LinkedHashMap<>(columnValueMap));
+					resultList.add(new HashMap<>(columnValueMap));
 				}
 				columnValueMap.clear();
 				curRow++;
