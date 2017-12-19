@@ -2,3 +2,4 @@
 ignore/
 #ignore file '.gitignore'
 .gitignore
+*.DS_Store
