@@ -1,26 +1,3 @@
-package com.xk.pre.agent.helper.excel.sax;
-
-import com.alibaba.fastjson.JSON;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.BuiltinFormats;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.xssf.eventusermodel.XSSFReader;
-import org.apache.poi.xssf.model.SharedStringsTable;
-import org.apache.poi.xssf.model.StylesTable;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
-import org.xml.sax.*;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * SAX 读取大文件内容
  *
@@ -262,22 +239,13 @@ public class ExcelSaxReader extends DefaultHandler {
 			} catch (Exception e) {
 			}
 		}
-
 		// t元素也包含字符串
 		if (isTElement) {
-			// 补全单元格之间的空单元格
-			if (!ref.equals(preRef)) {
-				countNullCell(ref, preRef);
-			}
 			// 将单元格内容加入rowlist中，在这之前先去掉字符串前后的空白符
 			String value = lastContents.toString().trim();
 			columnValueMap.put(ref, value);
 			isTElement = false;
 		} else if ("v".equals(name)) {
-			// 补全单元格之间的空单元格
-			if (!ref.equals(preRef)) {
-				countNullCell(ref, preRef);
-			}
 			// v => 单元格的值，如果单元格是字符串则v标签的值为该字符串在SST中的索引
 			String value = this.getDataValue(lastContents.toString().trim(), "");
 			columnValueMap.put(ref, value);
@@ -286,10 +254,6 @@ public class ExcelSaxReader extends DefaultHandler {
 				// 默认第一行为表头，以该行单元格数目为最大数目
 				if (curRow == 0) {
 					maxRef = ref;
-				}
-				// 补全一行尾部可能缺失的单元格
-				if (maxRef != null) {
-					countNullCell(maxRef, ref);
 				}
 				//如果 columnValueList 都是为空串，则不处理
 				boolean isBlank = true;
@@ -301,6 +265,7 @@ public class ExcelSaxReader extends DefaultHandler {
 					}
 				}
 				if (!isBlank) {
+					padWhitespace();
 					resultList.add(new LinkedHashMap<>(columnValueMap));
 				}
 				columnValueMap.clear();
@@ -312,19 +277,17 @@ public class ExcelSaxReader extends DefaultHandler {
 	}
 
 	/**
-	 * 计算两个单元格之间的单元格数目(同一行)
-	 *
-	 * @param ref    后一列
-	 * @param preRef 前一列
+	 * 填充空格
 	 * @return
 	 */
-	private void countNullCell(String ref, String preRef) {
-		int ref10 = convert10(ref.replaceAll("\\d+", ""));
-		int preRef10 = convert10(preRef.replaceAll("\\d+", ""));
-		for(int i=preRef10+1; i<ref10; i++) {
-			columnValueMap.put(convert26(i) + curRow, "");
+	private void padWhitespace() {
+		int maxRefInt = convert10(maxRef.replaceAll("\\d+", ""));
+		while(maxRefInt > 0) {
+			String key = convert26(maxRefInt--) + (curRow + 1);
+			if(!columnValueMap.containsKey(key)) {
+				columnValueMap.putIfAbsent(key, "");
+			}
 		}
-		columnValueMap.putIfAbsent(preRef, "");
 	}
 
 	@Override
@@ -373,13 +336,13 @@ public class ExcelSaxReader extends DefaultHandler {
 		return n;
 	}
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		try {
 			ExcelSaxReader excelSaxReader = new ExcelSaxReader();
-			List<Map<String, String>> mapList = excelSaxReader.process("/Users/lizebin/Desktop/test1.xlsx");
+			List<Map<String, String>> mapList = excelSaxReader.process("/Users/lizebin/Desktop/电话号码+卡号.xlsx");
 			System.out.println(JSON.toJSONString(mapList));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 }
