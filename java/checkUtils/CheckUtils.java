@@ -1,3 +1,7 @@
+
+import org.apache.commons.lang.CharUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Pattern;
 
 public final class CheckUtils {
@@ -33,7 +37,7 @@ public final class CheckUtils {
             return false;
         }
         for (int i = 0, length = value.length(); i < length; i++) {
-            if (!Character.isDigit(value.charAt(i))) {
+            if (!CharUtils.isAsciiNumeric(value.charAt(i))) {
                 return false;
             }
         }
@@ -51,7 +55,7 @@ public final class CheckUtils {
             return false;
         }
         for (int i = 0, length = value.length(); i < length; i++) {
-            if (!Character.isLetter(value.charAt(i))) {
+            if (!CharUtils.isAsciiAlpha(value.charAt(i))) {
                 return false;
             }
         }
@@ -69,7 +73,7 @@ public final class CheckUtils {
             return false;
         }
         for (int i = 0, length = value.length(); i < length; i++) {
-            if (!Character.isLetterOrDigit(value.charAt(i))) {
+            if (!CharUtils.isAsciiAlphanumeric(value.charAt(i))) {
                 return false;
             }
         }
@@ -120,8 +124,8 @@ public final class CheckUtils {
      * @param c
      * @return
      */
-    public static boolean isSpace(char c) {
-        return (c == ' ') || (c <= 0x000d && c >= 0x0009)
+    public static boolean isWhitespace(char c) {
+        return Character.isWhitespace(c) || (c <= 0x000d && c >= 0x0009)
             || (c >= 0x0080 &&
             (c == 0x00a0 || c == 0x0085 || c == 0x1680 || c == 0x180e || (c >= 0x2000 && c <= 0x200a) ||
                 c == 0x2028 || c == 0x2029 || c == 0x202f || c == 0x205f || c == 0x3000));
