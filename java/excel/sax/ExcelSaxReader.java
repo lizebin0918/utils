@@ -28,8 +28,23 @@ import java.util.*;
  * <artifactId>xerces</artifactId>
  * <version>2.4.0</version>
  * </dependency>
+ *
+ * 注意！
+ * 不能并行解析excel，所以在 process 方法加上了 synchronized，可以进行优化
+ *
  */
 public class ExcelSaxReader extends DefaultHandler {
+
+	private ExcelSaxReader() {
+	}
+
+	private static class InnerClass {
+		private static final ExcelSaxReader INSTANCE = new ExcelSaxReader();
+	}
+
+	public static ExcelSaxReader getInstance() {
+		return InnerClass.INSTANCE;
+	}
 
 	/**
 	 * 共享字符串表
@@ -89,15 +104,14 @@ public class ExcelSaxReader extends DefaultHandler {
 	private StylesTable stylesTable;
 
 	/**
-	 * 遍历工作簿中所有的电子表格
-	 *
+	 * 遍历工作簿中所有的电子表格，只能串行读取，并行读取数据会有误
 	 * @param filename
 	 * @throws IOException
 	 * @throws OpenXML4JException
 	 * @throws SAXException
 	 * @throws Exception
 	 */
-	public List<Map<String, String>> process(String filename) throws IOException, OpenXML4JException, SAXException {
+	public synchronized List<Map<String, String>> process(String filename) throws IOException, OpenXML4JException, SAXException {
 		OPCPackage pkg = OPCPackage.open(filename);
 		XSSFReader xssfReader = new XSSFReader(pkg);
 		stylesTable = xssfReader.getStylesTable();
@@ -250,15 +264,6 @@ public class ExcelSaxReader extends DefaultHandler {
 
 	@Override
 	public void endElement(String uri, String localName, String name) {
-		// 根据SST的索引值的到单元格的真正要存储的字符串
-		// 这时characters()方法可能会被调用多次
-		if (nextIsString && StringUtils.isNotEmpty(lastContents) && StringUtils.isNumeric(lastContents)) {
-			try {
-				int idx = Integer.parseInt(lastContents.toString());
-				lastContents = new StringBuilder(new XSSFRichTextString(sst.getEntryAt(idx)).toString());
-			} catch (Exception e) {
-			}
-		}
 		// t元素也包含字符串
 		if (isTElement) {
 			// 将单元格内容加入rowlist中，在这之前先去掉字符串前后的空白符
@@ -356,13 +361,12 @@ public class ExcelSaxReader extends DefaultHandler {
 		return n;
 	}
 
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		try {
-			ExcelSaxReader excelSaxReader = new ExcelSaxReader();
-			List<Map<String, String>> mapList = excelSaxReader.process("/Users/lizebin/Desktop/电话号码+卡号.xlsx");
+			List<Map<String, String>> mapList = ExcelSaxReader.getInstance().process("/Users/lizebin/Desktop/会员.xlsx");
 			System.out.println(JSON.toJSONString(mapList));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}*/
+	}
 }
