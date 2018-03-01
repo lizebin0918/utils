@@ -34,7 +34,7 @@ public class XkStringUtils {
 	 */
 	public static String deleteWhitespace(final String str) {
 		if (Objects.isNull(str) || str.trim().length() == 0) {
-			return str;
+			return str.trim();
 		}
 		final int sz = str.length();
 		final char[] chs = new char[sz];
