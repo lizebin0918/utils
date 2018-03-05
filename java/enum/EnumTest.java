@@ -5,40 +5,43 @@ import java.util.stream.Stream;
 
 public class EnumTest {
 
-	private String cycleUnit;
+	/**
+	类型：年/月/周/日
+	*/
+	private String type;
 
-	public String getCycleUnit() {
-		return cycleUnit;
+	public String getType() {
+		return type;
 	}
 
-	public void setCycleUnit(String cycleUnit) {
-		this.cycleUnit = cycleUnit;
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	/**
 	 * 循环周期
 	 */
-	public enum CYCLE_UNIT_ENUM {
+	public enum TYPE_ENUM {
     	YEAR("y"), MONTH("m"), WEEK("w"), DAY("d");
-    	CYCLE_UNIT_ENUM(String value) {
+    	TYPE_ENUM(String value) {
     		this.value = value;
 	    }
     	private String value;
 	    public String getValue() {
 		    return value;
 	    }
-	    public static Optional<CYCLE_UNIT_ENUM> get(String value) {
+	    public static Optional<TYPE_ENUM> get(String value) {
 		    return Stream.of(values()).filter(item -> item.value.equals(value)).findFirst();
 	    }
     }
 
 	public static void main(String[] args) {
-		EnumTest task = new EnumTest();
+		EnumTest test = new EnumTest();
 		//前端请求参数或者读取数据库的值
-		task.setCycleUnit("d");
+		test.setType("d");
 		//程序处理，采用switch判断
-		CYCLE_UNIT_ENUM cycleUnitEnum = CYCLE_UNIT_ENUM.get(task.getCycleUnit()).orElseThrow(() -> new RuntimeException(""));
-		switch(cycleUnitEnum) {
+		TYPE_ENUM type = TYPE_ENUM.get(test.getType()).orElseThrow(() -> new RuntimeException("枚举值不合法"));
+		switch(type) {
 			case DAY:
 				System.out.println("it is day");
 				break;
