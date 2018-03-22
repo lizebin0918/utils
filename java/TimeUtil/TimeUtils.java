@@ -1,8 +1,7 @@
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.*;
 import java.util.*;
 
 /**
@@ -602,7 +601,7 @@ public final class TimeUtils {
      * @param endDatetime   结束时间
      * @return 返回相差的月数
      */
-    public static long getOffset(ChronoUnit units, LocalDateTime startDatetime, LocalDateTime endDatetime) {
+    public static long getOffset(ChronoUnit units, Temporal startDatetime, Temporal endDatetime) {
         return units.between(startDatetime, endDatetime);
     }
 
