@@ -29,13 +29,11 @@ import java.util.*;
  * <version>2.4.0</version>
  * </dependency>
  *
- * 注意！
- * 不能并行解析excel，所以在 process 方法加上了 synchronized，可以进行优化
  *
  */
-public class ExcelSaxReader extends DefaultHandler {
+public class ExcelSaxReader_1 extends DefaultHandler {
 
-	private ExcelSaxReader() {
+	private ExcelSaxReader_1() {
 	}
 
 	private static class InnerClass {
@@ -85,8 +83,6 @@ public class ExcelSaxReader extends DefaultHandler {
 	 * 单元格数据类型，默认为字符串类型
 	 */
 	private CELL_DATA_TYPE_ENUM nextDataType = CELL_DATA_TYPE_ENUM.SSTINDEX;
-
-	private static final DataFormatter formatter = new DataFormatter();
 
 	private short formatIndex;
 
@@ -246,14 +242,14 @@ public class ExcelSaxReader extends DefaultHandler {
 				break;
 			case NUMBER:
 				if (formatString != null) {
-					thisStr = formatter.formatRawCellContents(Double.parseDouble(value), formatIndex, formatString).trim();
+					thisStr = new DataFormatter().formatRawCellContents(Double.parseDouble(value), formatIndex, formatString).trim();
 				} else {
 					thisStr = value;
 				}
 				thisStr = thisStr.replace("_", "").trim();
 				break;
 			case DATE:
-				thisStr = formatter.formatRawCellContents(Double.parseDouble(value), formatIndex, formatString);
+				thisStr = new DataFormatter().formatRawCellContents(Double.parseDouble(value), formatIndex, formatString);
 				break;
 			default:
 				thisStr = "";
