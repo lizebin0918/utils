@@ -1,4 +1,3 @@
-
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -18,22 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-/**
- * SAX 读取大文件内容
- *
- * 1.poi 依赖
- * 2.xerxes 依赖
- * <dependency>
- * <groupId>xerces</groupId>
- * <artifactId>xerces</artifactId>
- * <version>2.4.0</version>
- * </dependency>
- *
- *
- */
-public class ExcelSaxReader_1 extends DefaultHandler {
+public class ExcelSaxReader extends DefaultHandler {
 
-	private ExcelSaxReader_1() {
+	private ExcelSaxReader() {
 	}
 
 	private static class InnerClass {
@@ -186,6 +172,9 @@ public class ExcelSaxReader_1 extends DefaultHandler {
 			nextDataType = CELL_DATA_TYPE_ENUM.SSTINDEX;
 		} else if ("str".equals(cellType)) {
 			nextDataType = CELL_DATA_TYPE_ENUM.FORMULA;
+		} else if (Objects.isNull(cellType)) {
+			nextDataType = CELL_DATA_TYPE_ENUM.NULL;
+			return;
 		}
 
 		if (cellStyleStr != null) {
@@ -260,6 +249,11 @@ public class ExcelSaxReader_1 extends DefaultHandler {
 
 	@Override
 	public void endElement(String uri, String localName, String name) {
+		//单元格为空的问题
+		if("c".equals(name) && nextDataType == CELL_DATA_TYPE_ENUM.NULL) {
+			columnValueMap.put(ref, "null");
+			return;
+		}
 		// t元素也包含字符串
 		if (isTElement) {
 			// 将单元格内容加入rowlist中，在这之前先去掉字符串前后的空白符
@@ -359,7 +353,7 @@ public class ExcelSaxReader_1 extends DefaultHandler {
 
 	public static void main(String[] args) {
 		try {
-			List<Map<String, String>> mapList = ExcelSaxReader.getInstance().process("/Users/lizebin/Desktop/会员.xlsx");
+			List<Map<String, String>> mapList = ExcelSaxReader.getInstance().process("/Users/lizebin/Desktop/心康云-华虞门店导入表（模板）(1).xlsx");
 			System.out.println(JSON.toJSONString(mapList));
 		} catch (Exception e) {
 			e.printStackTrace();
