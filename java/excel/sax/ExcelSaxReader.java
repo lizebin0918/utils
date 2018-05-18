@@ -241,7 +241,7 @@ public class ExcelSaxReader extends DefaultHandler {
 				thisStr = new DataFormatter().formatRawCellContents(Double.parseDouble(value), formatIndex, formatString);
 				break;
 			default:
-				thisStr = "";
+				thisStr = Objects.toString(value, "");
 				break;
 		}
 		return thisStr;
@@ -251,7 +251,7 @@ public class ExcelSaxReader extends DefaultHandler {
 	public void endElement(String uri, String localName, String name) {
 		//单元格为空的问题
 		if("c".equals(name) && nextDataType == CELL_DATA_TYPE_ENUM.NULL) {
-			columnValueMap.put(ref, "null");
+			columnValueMap.put(ref, lastContents.toString());
 			return;
 		}
 		// t元素也包含字符串
