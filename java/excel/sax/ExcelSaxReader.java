@@ -1,22 +1,12 @@
-import com.alibaba.fastjson.JSON;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.BuiltinFormats;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.xssf.eventusermodel.XSSFReader;
-import org.apache.poi.xssf.model.SharedStringsTable;
-import org.apache.poi.xssf.model.StylesTable;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
-import org.xml.sax.*;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-
+/**
+ * 只支持excel2007以上版本
+ * 除了poi依赖，另外需要以下依赖
+ *<dependency>
+ *    <groupId>xerces</groupId>
+ *    <artifactId>xerces</artifactId>
+ *    <version>2.4.0</version>
+ *</dependency>
+ */
 public class ExcelSaxReader extends DefaultHandler {
 
 	private ExcelSaxReader() {
@@ -251,19 +241,19 @@ public class ExcelSaxReader extends DefaultHandler {
 	public void endElement(String uri, String localName, String name) {
 		//单元格为空的问题
 		if("c".equals(name) && nextDataType == CELL_DATA_TYPE_ENUM.NULL) {
-			columnValueMap.put(ref, lastContents.toString());
+			columnValueMap.putIfAbsent(ref.replaceAll("\\d+", ""), "");
 			return;
 		}
 		// t元素也包含字符串
 		if (isTElement) {
 			// 将单元格内容加入rowlist中，在这之前先去掉字符串前后的空白符
 			String value = lastContents.toString().trim();
-			columnValueMap.put(ref, value);
+			columnValueMap.put(ref.replaceAll("\\d+", ""), value);
 			isTElement = false;
 		} else if ("v".equals(name)) {
 			// v => 单元格的值，如果单元格是字符串则v标签的值为该字符串在SST中的索引
 			String value = this.getDataValue(lastContents.toString().trim(), "");
-			columnValueMap.put(ref, value);
+			columnValueMap.put(ref.replaceAll("\\d+", ""), value);
 		} else {
 			if (name.equals("row")) {
 				// 默认第一行为表头，以该行单元格数目为最大数目
@@ -298,7 +288,7 @@ public class ExcelSaxReader extends DefaultHandler {
 	private void padWhitespace() {
 		int maxRefInt = convert10(maxRef.replaceAll("\\d+", ""));
 		while(maxRefInt > 0) {
-			String key = convert26(maxRefInt--) + (curRow + 1);
+			String key = convert26(maxRefInt--);
 			if(!columnValueMap.containsKey(key)) {
 				columnValueMap.putIfAbsent(key, "");
 			}
@@ -353,7 +343,7 @@ public class ExcelSaxReader extends DefaultHandler {
 
 	public static void main(String[] args) {
 		try {
-			List<Map<String, String>> mapList = ExcelSaxReader.getInstance().process("/Users/lizebin/Desktop/心康云-华虞门店导入表（模板）(1).xlsx");
+			List<Map<String, String>> mapList = ExcelSaxReader.getInstance().process("/Users/lizebin/Desktop/心康云-门店导入表（模板）(1).xlsx");
 			System.out.println(JSON.toJSONString(mapList));
 		} catch (Exception e) {
 			e.printStackTrace();
