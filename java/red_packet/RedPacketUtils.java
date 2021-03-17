@@ -11,7 +11,7 @@ import org.junit.Assert;
  * @author lizebin
  *
  */
-public class RedEnvelopeUtils {
+public class RedPacketUtils {
 
 	/*Random.nextInt()的确是线程安全，但是对于高并发的情况，使用ThreadLocalRandom效率更高*/
 	//private static final Random random = new Random();
